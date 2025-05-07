@@ -1,9 +1,11 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
-
+import express from 'express';
+import { userRouter } from "./routes/user";
 const PORT = 4000;
 
-const httpServer = createServer();
+const app = express();
+const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
@@ -37,6 +39,8 @@ io.on("connection", (socket) => {
     console.log(`Socket disconnected: ${socket.id}`);
   });
 });
+
+app.use('/api/v1/user',userRouter)
 
 httpServer.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
