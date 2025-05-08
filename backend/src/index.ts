@@ -39,7 +39,7 @@ io.on("connection", (socket) => {
     console.log(`Socket disconnected: ${socket.id}`);
   });
 });
-
+app.use(express.json());
 app.use('/api/v1/user',userRouter)
 
 httpServer.listen(PORT, () => {
