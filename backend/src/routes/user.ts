@@ -1,11 +1,12 @@
 import express from 'express';
-import { registerSchema } from '../types';
+import { RegisterSchema,LoginSchema } from '../types';
 import {prismaClient} from '../prismaClient';
 const router = express.Router();
+import jwt from "jsonwebtoken"
 
 router.post('/register',async(req,res):Promise<any>=>{
     const body = req.body;
-    if(!registerSchema.parse(body)){
+    if(!RegisterSchema.parse(body)){
         res.json({
             message:"The registration validation failed"
         })
@@ -32,5 +33,32 @@ router.post('/register',async(req,res):Promise<any>=>{
     res.json({
         message:"Validation passed",user
     })
+})
+router.post("/login",async(req,res)=>{
+    const body = req.body;
+    if(!LoginSchema.parse(body)){
+        res.json({
+            message:"Login validation failed."
+        })
+    }
+    const user = await prismaClient.user.findUnique({
+        where:{
+            email:body.email
+        }
+    })
+    if(!user){
+        res.json({
+            message:"No user exists of this username."
+        })
+        return;
+    }
+
+    const token = jwt.sign({
+        id: user.id
+    },'abc')
+    res.json({
+        token:token,name:user.name
+    })
+    
 })
 export const userRouter = router;
