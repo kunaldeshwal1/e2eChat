@@ -2,11 +2,16 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import express from 'express';
 import { userRouter } from "./routes/user";
+import cors from 'cors';
 const PORT = 4000;
+
 
 const app = express();
 const httpServer = createServer(app);
-
+app.use(cors({
+  origin: '*',
+  credentials: true
+}));
 const io = new Server(httpServer, {
   cors: {
     origin: "*",

@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken"
 
 router.post('/register',async(req,res):Promise<any>=>{
     const body = req.body;
+    console.log(body)
     if(!RegisterSchema.parse(body)){
         res.json({
             message:"The registration validation failed"
