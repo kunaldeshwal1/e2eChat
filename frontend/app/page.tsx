@@ -1,7 +1,13 @@
-import Image from "next/image";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import Dashboard from "../components/Dashboard";
+export default async function DashboardPage() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("session");
+  console.log(session);
+  if (!session) {
+    redirect("/login");
+  }
 
-export default function Home() {
-  return (
-    <div>Hello</div>
-  );
+  return <Dashboard />;
 }

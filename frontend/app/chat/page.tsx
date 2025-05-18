@@ -1,7 +1,11 @@
-"use client"
+"use client";
 import { useEffect, useState, useRef } from "react";
 import { socket } from "../../lib/socket";
-import { encryptMessage, decryptMessage, importSecretKey } from "../../lib/crypto";
+import {
+  encryptMessage,
+  decryptMessage,
+  importSecretKey,
+} from "../../lib/crypto";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -9,82 +13,81 @@ import { useRouter } from "next/navigation";
 
 interface ChatMessage {
   text: string;
-  type: 'incoming' | 'outgoing';
+  type: "incoming" | "outgoing";
 }
 
 export default function Chat() {
   const router = useRouter();
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [encryptionKey, setEncryptionKey] = useState<CryptoKey | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Avoid repeated handler registrations by using refs:
   const keyBufferRef = useRef<string | null>(null);
   useEffect(() => {
-    const roomId = localStorage.getItem('roomId');
-    const keyBuffer = localStorage.getItem('keyBuffer');
-    const saved = localStorage.getItem('chatMessage');
-    if(saved){
+    const roomId = localStorage.getItem("roomId");
+    const keyBuffer = localStorage.getItem("keyBuffer");
+    const saved = localStorage.getItem("chatMessage");
+    if (saved) {
       try {
         setMessages(JSON.parse(saved));
-      } catch(e) {
+      } catch (e) {
         setMessages([]);
       }
     }
     keyBufferRef.current = keyBuffer;
     if (roomId) {
-      socket.emit('join-room', { roomId, key: keyBuffer });
+      socket.emit("join-room", { roomId, key: keyBuffer });
     }
     if (!roomId || !keyBuffer) {
-      router.push('/dashboard');
+      router.push("/");
       return;
     }
-    setLoading(false); 
+    setLoading(false);
 
     importSecretKey(keyBuffer)
-      .then(key => setEncryptionKey(key))
-      .catch(error => console.error('Error importing key:', error));
+      .then((key) => setEncryptionKey(key))
+      .catch((error) => console.error("Error importing key:", error));
 
     const handleMessage = async (encryptedMsg: any) => {
       if (!keyBufferRef.current) return;
       try {
         const key = await importSecretKey(keyBufferRef.current);
         const decryptedMsg = await decryptMessage(encryptedMsg, key);
-        setMessages(prev => [...prev, { text: decryptedMsg, type: 'incoming' }]);
+        setMessages((prev) => [
+          ...prev,
+          { text: decryptedMsg, type: "incoming" },
+        ]);
       } catch (error) {
         console.error("Decryption error:", error);
       }
     };
 
-    socket.on('message', handleMessage);
+    socket.on("message", handleMessage);
 
-    socket.on('user joined', (text: string) => {
-      console.log(text)
-      // option: setMessages(prev => [...prev, { text, type: 'incoming' }]);
+    socket.on("user joined", (text: string) => {
+      console.log(text);
     });
 
-    // Key sharing - only update localStorage, not state directly!
-    socket.on('share-key', (sharedKeyBuffer: string) => {
-      // Save for future reloads
-      localStorage.setItem('keyBuffer', sharedKeyBuffer);
+    socket.on("share-key", (sharedKeyBuffer: string) => {
+      localStorage.setItem("keyBuffer", sharedKeyBuffer);
       keyBufferRef.current = sharedKeyBuffer;
       importSecretKey(sharedKeyBuffer)
-        .then(key => setEncryptionKey(key))
-        .catch(error => console.error('Error importing shared key:', error));
+        .then((key) => setEncryptionKey(key))
+        .catch((error) => console.error("Error importing shared key:", error));
     });
 
     return () => {
-      socket.off('message', handleMessage);
-      socket.off('user joined');
-      socket.off('share-key');
+      socket.off("message", handleMessage);
+      socket.off("user joined");
+      socket.off("share-key");
     };
   }, []);
 
   useEffect(() => {
-    const roomId = localStorage.getItem('roomId');
-    if(!roomId) return
-    localStorage.setItem('chatMessage', JSON.stringify(messages));
+    const roomId = localStorage.getItem("roomId");
+    if (!roomId) return;
+    localStorage.setItem("chatMessage", JSON.stringify(messages));
   }, [messages]);
   const sendMessage = async () => {
     const roomId = localStorage.getItem("roomId");
@@ -97,10 +100,10 @@ export default function Chat() {
         roomId: roomId,
         message: encryptedMsg,
       });
-      setMessages(prev => [...prev, { text: message, type: 'outgoing' }]);
-      setMessage('');
+      setMessages((prev) => [...prev, { text: message, type: "outgoing" }]);
+      setMessage("");
     } catch (error) {
-      console.error('Encryption error:', error);
+      console.error("Encryption error:", error);
     }
   };
 
@@ -115,14 +118,14 @@ export default function Chat() {
             <div
               key={index}
               className={`mb-4 max-w-[70%] ${
-                msg.type === 'incoming' ? 'ml-0' : 'ml-auto'
+                msg.type === "incoming" ? "ml-0" : "ml-auto"
               }`}
             >
               <div
                 className={`p-3 rounded-lg ${
-                  msg.type === 'incoming'
-                    ? 'bg-gray-200 text-gray-800 rounded-tl-none'
-                    : 'bg-blue-500 text-white rounded-tr-none'
+                  msg.type === "incoming"
+                    ? "bg-gray-200 text-gray-800 rounded-tl-none"
+                    : "bg-blue-500 text-white rounded-tr-none"
                 }`}
               >
                 {msg.text}
@@ -137,17 +140,20 @@ export default function Chat() {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Type your message..."
-            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             className="flex-1"
           />
           <Button onClick={sendMessage}>Send</Button>
-          <Button onClick={()=>{
-            localStorage.removeItem('roomId');
-            localStorage.removeItem('keyBuffer');
-            localStorage.removeItem('chatMessage');
-            router.push("/dashboard")
-          }}>Exit Room</Button>
-
+          <Button
+            onClick={() => {
+              localStorage.removeItem("roomId");
+              localStorage.removeItem("keyBuffer");
+              localStorage.removeItem("chatMessage");
+              router.push("/dashboard");
+            }}
+          >
+            Exit Room
+          </Button>
         </div>
       </Card>
     </div>
