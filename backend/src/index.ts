@@ -43,10 +43,16 @@ io.on("connection", (socket) => {
     }
   );
 
-  socket.on("message", (data: { roomId: string; message: string }) => {
+  socket.on("groupMessage", (data: { roomId: string; message: string }) => {
     if (data.roomId && data.message) {
-      socket.to(data.roomId).emit("message", data.message);
+      socket.to(data.roomId).emit("groupMessage", data.message);
     }
+  });
+  socket.on("leaveGroupChat", ({ roomId }: { roomId: string }) => {
+    socket.leave(roomId);
+  });
+  socket.on("leavePrivateChat", ({ roomId }: { roomId: string }) => {
+    socket.leave(roomId);
   });
 
   socket.on("disconnect", () => {

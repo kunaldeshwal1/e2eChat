@@ -1,4 +1,4 @@
-import Dashboard from "../components/Dashboard";
-export default async function DashboardPage() {
-  return <Dashboard />;
+import Dashboard from "./dashboard/page";
+export default async function Home() {
+  return <div>Welcome to the chat application</div>;
 }

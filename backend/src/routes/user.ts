@@ -5,6 +5,7 @@ const router = express.Router();
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { auth, CustomRequest } from "../authMiddleware";
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -45,7 +46,7 @@ router.post("/register", async (req, res): Promise<any> => {
     user,
   });
 });
-
+//login
 router.post("/login", async (req, res) => {
   const body = req.body;
   if (!LoginSchema.parse(body)) {
@@ -86,25 +87,33 @@ router.post("/login", async (req, res) => {
       sameSite: "strict",
       maxAge: 60 * 60 * 1000,
     })
-    .json({ message: "Logged in", name: user.name });
+    .json({ message: "Logged in", id: user.id, name: user.name });
 });
-
-router.post("/logout", async (req, res) => {
-  res.clearCookie("session");
-  res.json({
-    message: "You've logged out!",
+//allusers
+router.get("/allusers", auth, async (req, res): Promise<any> => {
+  const customReq = req as CustomRequest;
+  console.log(customReq.user);
+  const users = await prismaClient.user.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
   });
-});
-
-router.get("/allusers", async (req, res): Promise<any> => {
-  const users = await prismaClient.user.findMany();
-  if (!users) {
+  if (!users.length) {
     return res.json({
       message: "No user present in the db",
     });
   }
   res.json({
     allUsers: users,
+  });
+});
+
+//logout
+router.post("/logout", async (req, res) => {
+  res.clearCookie("session");
+  res.json({
+    message: "You've logged out!",
   });
 });
 export const userRouter = router;

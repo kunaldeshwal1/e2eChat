@@ -16,7 +16,7 @@ interface ChatMessage {
   type: "incoming" | "outgoing";
 }
 
-export default function Chat() {
+export default function Privatechat() {
   const router = useRouter();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -25,9 +25,9 @@ export default function Chat() {
 
   const keyBufferRef = useRef<string | null>(null);
   useEffect(() => {
-    const roomId = localStorage.getItem("roomId");
+    const roomId = localStorage.getItem("privateRoomId");
     const keyBuffer = localStorage.getItem("keyBuffer");
-    const saved = localStorage.getItem("chatMessage");
+    const saved = localStorage.getItem("privateChatMessage");
     if (saved) {
       try {
         setMessages(JSON.parse(saved));
@@ -85,12 +85,12 @@ export default function Chat() {
   }, []);
 
   useEffect(() => {
-    const roomId = localStorage.getItem("roomId");
+    const roomId = localStorage.getItem("privateRoomId");
     if (!roomId) return;
-    localStorage.setItem("chatMessage", JSON.stringify(messages));
+    localStorage.setItem("privateChatMessage", JSON.stringify(messages));
   }, [messages]);
   const sendMessage = async () => {
-    const roomId = localStorage.getItem("roomId");
+    const roomId = localStorage.getItem("privateRoomId");
     const keyBuffer = localStorage.getItem("keyBuffer");
     if (!message || !encryptionKey || !roomId || !keyBuffer) return;
 
@@ -112,6 +112,7 @@ export default function Chat() {
   }
   return (
     <div className="flex justify-center items-center h-[100vh]">
+      <h1>thisis private chat</h1>
       <Card className="w-[50%] p-5">
         <div className="messages-container h-[400px] overflow-y-auto mb-4 p-4">
           {messages.map((msg, index) => (
@@ -146,11 +147,11 @@ export default function Chat() {
           <Button onClick={sendMessage}>Send</Button>
           <Button
             onClick={() => {
-              const roomId = localStorage.getItem("roomId");
-              localStorage.removeItem("roomId");
+              const roomId = localStorage.getItem("privateRoomId");
+              localStorage.removeItem("privateRoomId");
               localStorage.removeItem("keyBuffer");
-              localStorage.removeItem("chatMessage");
-              socket.emit("leaveGroupChat", {
+              localStorage.removeItem("privateChatMessage");
+              socket.emit("leavePrivateChat", {
                 roomId,
               });
               router.push("/dashboard");

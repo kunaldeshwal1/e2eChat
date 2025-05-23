@@ -25,6 +25,9 @@ export default function Login() {
         "Content-type": "application/json",
       },
     });
+    const data = await response.json();
+    console.log(data);
+    localStorage.setItem("currUsername", data.name);
     setEmail("");
     setPassword("");
     if (response.ok) router.push("/");
