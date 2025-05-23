@@ -22,8 +22,9 @@ export default function Usercard({ id, name }: UserCardProps) {
   const [privateRoomId, setPrivateRoomId] = useState("");
   useEffect(() => {
     const currUser = localStorage.getItem("currUsername");
+    console.log(currUser);
     const userArr = [name, currUser].sort().join("_");
-    console.log(userArr);
+    setPrivateRoomId(userArr);
   }, [name]);
 
   const router = useRouter();
