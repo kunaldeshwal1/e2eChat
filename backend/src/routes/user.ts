@@ -92,8 +92,13 @@ router.post("/login", async (req, res) => {
 //allusers
 router.get("/allusers", auth, async (req, res): Promise<any> => {
   const customReq = req as CustomRequest;
-  console.log(customReq.user);
+
   const users = await prismaClient.user.findMany({
+    where: {
+      NOT: {
+        id: customReq.user?.userId,
+      },
+    },
     select: {
       id: true,
       name: true,

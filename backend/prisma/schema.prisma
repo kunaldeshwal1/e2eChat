@@ -14,7 +14,7 @@ model User {
   name     String
   password String
   messages Message[]
-  room    Room[]   
+  rooms    Room[]   
 }
 
 model Message {
@@ -23,12 +23,13 @@ model Message {
   createdAt DateTime @default(now())
   senderId  Int
   sender    User     @relation(fields: [senderId], references: [id])
-  roomId    Int
+  roomId    String
   room      Room     @relation(fields: [roomId], references: [id])
 }
 
 model Room {
-  id       Int       @id @default(autoincrement())
-  messages Message[]
+  id       String       @id @default(uuid())
+  name     String       @unique
+  content Message[]
   users    User[]  
 }

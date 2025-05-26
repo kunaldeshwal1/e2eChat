@@ -5,7 +5,8 @@ import { userRouter } from "./routes/user";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { auth } from "./authMiddleware";
-import { messageRouter } from "./routes/messages";
+import { messageRouter } from "./routes/message";
+import { roomRouter } from "./routes/room";
 
 const PORT = 4000;
 
@@ -61,7 +62,8 @@ io.on("connection", (socket) => {
 });
 app.use(express.json());
 app.use("/api/v1/user", userRouter);
-app.use("/api/v1/messages", auth, messageRouter);
+app.use("/api/v1/message", auth, messageRouter);
+app.use("/api/v1/room", auth, roomRouter);
 
 httpServer.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
