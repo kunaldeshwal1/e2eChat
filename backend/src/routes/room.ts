@@ -35,4 +35,16 @@ router.post("/public", async (req, res) => {
   });
 });
 
+router.get("/", async (req, res) => {
+  const rooms = await prismaClient.room.findMany();
+  if (rooms.length <= 0) {
+    res.status(204).json({
+      message: "No room available",
+    });
+  }
+  res.status(200).json({
+    rooms,
+  });
+});
+
 export const roomRouter = router;
