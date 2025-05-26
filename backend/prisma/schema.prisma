@@ -6,7 +6,10 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
+enum RoomType {
+  public
+  private
+}
 
 model User {
   id       Int       @id @default(autoincrement())
@@ -30,6 +33,7 @@ model Message {
 model Room {
   id       String       @id @default(uuid())
   name     String       @unique
+  type     RoomType     @default(public)
   content Message[]
   users    User[]  
 }

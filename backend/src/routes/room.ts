@@ -3,7 +3,7 @@ import { RoomSchema } from "../types";
 import { prismaClient } from "../prismaClient";
 import { CustomRequest } from "../authMiddleware";
 const router = express.Router();
-router.post("/create", async (req, res) => {
+router.post("/public", async (req, res) => {
   const body = req.body;
   const customReq = req as CustomRequest;
 

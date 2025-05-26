@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 export default function Dashboard() {
   const [roomId, setRoomId] = useState("");
   const router = useRouter();
-  const joinRoom = async () => {
+  const createRoom = async () => {
     if (!roomId) return;
     try {
       const key = await generateKey();
@@ -33,7 +33,7 @@ export default function Dashboard() {
           value={roomId}
           onChange={(e) => setRoomId(e.target.value)}
         />
-        <Button onClick={joinRoom}>Join room</Button>
+        <Button onClick={createRoom}>Create room</Button>
       </Card>
     </div>
   );

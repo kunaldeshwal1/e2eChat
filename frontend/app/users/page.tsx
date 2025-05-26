@@ -19,7 +19,7 @@ export default async function Users() {
   console.log(session?.value);
   const response = await fetch(`${server}/api/v1/user/allusers`, {
     headers: {
-      Authorization: `Bearer ${session?.value}`,
+      Cookie: `session=${session?.value}`,
     },
   });
   const data: AllUserResponse = await response.json();
