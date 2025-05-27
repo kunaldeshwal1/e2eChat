@@ -19,7 +19,7 @@ type AllGroupResponse = {
 export default async function Dashboard() {
   const cookieStore = await cookies();
   const session = cookieStore.get("session");
-  const response = await fetch(`${server}/api/v1/room/all`, {
+  const response = await fetch(`${server}/api/v1/room`, {
     headers: {
       Cookie: `session=${session?.value}`,
     },
@@ -27,16 +27,18 @@ export default async function Dashboard() {
   const data: AllGroupResponse = await response.json();
   const groups: Group[] = data.allGroups;
   return (
-    <div className="flex flex-col justify-center items-center h-[80vh]">
-      {groups.map((group) => (
-        <Groupcard
-          key={group.id}
-          id={group.id}
-          name={group.name}
-          type={group.type}
-        />
-      ))}
-      <div className="">
+    <div>
+      <div className="grid grid-cols-4 gap-4 ">
+        {groups.map((group) => (
+          <Groupcard
+            key={group.id}
+            id={group.id}
+            name={group.name}
+            type={group.type}
+          />
+        ))}
+      </div>
+      <div className="flex justify-center">
         <Inputcard session={session?.value} />
       </div>
     </div>
