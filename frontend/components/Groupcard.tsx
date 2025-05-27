@@ -13,13 +13,30 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { socket } from "@/lib/socket";
 import { useRouter } from "next/navigation";
 import { generateKey, exportCryptoKey } from "@/lib/crypto";
+import { Group } from "@/app/dashboard/page";
 
-type UserCardProps = {
-  id: number;
+type GroupcardProps = {
+  id: string;
   name: string;
+  type: string;
 };
-export default function Groupcard() {
-  const handleClick = () => {};
+
+export default function Groupcard({ id, name, type }: GroupcardProps) {
+  const router = useRouter();
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (!id) return;
+    try {
+      const key = await generateKey();
+      const exportKey = await exportCryptoKey(key);
+      localStorage.setItem("roomId", id);
+      localStorage.setItem("keyBuffer", exportKey);
+      socket.emit("join-room", { id, key: exportKey });
+      router.push("/chat");
+    } catch (error) {
+      console.error("Error generating key:", error);
+    }
+  };
   return (
     <Card className="w-[350px] ">
       <CardHeader className="flex">
@@ -28,9 +45,8 @@ export default function Groupcard() {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <CardTitle>
-          <CardDescription>
-            Deploy your new project in one-click.
-          </CardDescription>
+          <CardDescription>Group Type: {type}</CardDescription>
+          <CardDescription>Group Name: {name}</CardDescription>
         </CardTitle>
       </CardHeader>
       <CardFooter className="flex justify-between">

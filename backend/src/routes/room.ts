@@ -5,6 +5,7 @@ import { CustomRequest } from "../authMiddleware";
 const router = express.Router();
 router.post("/public", async (req, res) => {
   const body = req.body;
+  console.log("this is room body", body);
   const customReq = req as CustomRequest;
 
   if (!RoomSchema.parse(body)) {
@@ -31,11 +32,11 @@ router.post("/public", async (req, res) => {
     },
   });
   res.status(200).json({
-    room,
+    rooms: room,
   });
 });
 
-router.get("/", async (req, res) => {
+router.get("/all", async (req, res) => {
   const rooms = await prismaClient.room.findMany();
   if (rooms.length <= 0) {
     res.status(204).json({
@@ -43,7 +44,7 @@ router.get("/", async (req, res) => {
     });
   }
   res.status(200).json({
-    rooms,
+    allGroups: rooms,
   });
 });
 

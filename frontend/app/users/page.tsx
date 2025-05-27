@@ -16,7 +16,6 @@ type AllUserResponse = {
 export default async function Users() {
   const cookieStore = await cookies();
   const session = cookieStore.get("session");
-  console.log(session?.value);
   const response = await fetch(`${server}/api/v1/user/allusers`, {
     headers: {
       Cookie: `session=${session?.value}`,
@@ -24,7 +23,7 @@ export default async function Users() {
   });
   const data: AllUserResponse = await response.json();
   const users: User[] = data.allUsers;
-
+  console.log(data);
   await new Promise((res) => setTimeout(res, 1000));
   return (
     <div className="flex flex-col gap-1 items-center  justify-center h-[80dvh]">
