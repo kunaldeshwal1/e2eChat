@@ -90,7 +90,7 @@ router.post("/login", async (req, res) => {
     .json({ message: "Logged in", id: user.id, name: user.name });
 });
 //allusers
-router.get("/allusers", auth, async (req, res): Promise<any> => {
+router.get("/", auth, async (req, res): Promise<any> => {
   const customReq = req as CustomRequest;
 
   const users = await prismaClient.user.findMany({

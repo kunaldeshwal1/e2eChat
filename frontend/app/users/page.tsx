@@ -16,7 +16,7 @@ type AllUserResponse = {
 export default async function Users() {
   const cookieStore = await cookies();
   const session = cookieStore.get("session");
-  const response = await fetch(`${server}/api/v1/user/allusers`, {
+  const response = await fetch(`${server}/api/v1/user`, {
     headers: {
       Cookie: `session=${session?.value}`,
     },
