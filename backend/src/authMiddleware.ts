@@ -6,7 +6,7 @@ dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 interface MyJWTPayload {
-  userId: number;
+  userId: string;
   iat: number;
 }
 export interface CustomRequest extends Request {
@@ -15,7 +15,6 @@ export interface CustomRequest extends Request {
 export const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.cookies.session;
-    console.log("here", token);
     if (!token) {
       throw new Error();
     }
