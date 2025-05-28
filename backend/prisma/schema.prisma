@@ -12,7 +12,7 @@ enum RoomType {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
+  id       String       @id @default(uuid())
   email    String    @unique
   name     String
   password String
@@ -24,7 +24,7 @@ model Message {
   id        Int      @id @default(autoincrement())
   content   String
   createdAt DateTime @default(now())
-  senderId  Int
+  senderId  String
   sender    User     @relation(fields: [senderId], references: [id])
   roomId    String
   room      Room     @relation(fields: [roomId], references: [id])
