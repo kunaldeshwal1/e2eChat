@@ -7,7 +7,7 @@ import Usercard from "@/components/Usercard";
 dotenv.config();
 const server = process.env.NEXT_PUBLIC_SERVER_URL;
 type User = {
-  id: number;
+  id: string;
   name: string;
 };
 type AllUserResponse = {

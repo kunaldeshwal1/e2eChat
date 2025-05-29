@@ -87,4 +87,38 @@ router.get("/", async (req, res) => {
   });
 });
 
+router.get("/contacts", async (req, res): Promise<any> => {
+  const customReq = req as CustomRequest;
+  const currUserId = customReq.user?.userId;
+  const currUser = await prismaClient.user.findUnique({
+    where: {
+      id: currUserId,
+    },
+    select: {
+      name: true,
+    },
+  });
+  console.log(currUser);
+  const roomsList = await prismaClient.room.findMany({
+    where: {
+      OR: [
+        {
+          id: {
+            startsWith: currUser?.name,
+          },
+        },
+        { id: { endsWith: currUser?.name } },
+      ],
+    },
+  });
+  if (!roomsList) {
+    return res.status(409).json({
+      message: "Something went wrong white finding user contacts",
+    });
+  }
+  res.status(200).json({
+    myRooms: roomsList,
+  });
+});
+
 export const roomRouter = router;

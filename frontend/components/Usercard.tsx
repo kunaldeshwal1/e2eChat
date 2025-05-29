@@ -17,7 +17,7 @@ import dotenv from "dotenv";
 dotenv.config();
 const server = process.env.NEXT_PUBLIC_SERVER_URL;
 type UserCardProps = {
-  id: number;
+  id: string;
   name: string;
 };
 export default function Usercard({ id, name }: UserCardProps) {
