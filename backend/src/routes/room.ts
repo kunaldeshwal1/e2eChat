@@ -98,7 +98,6 @@ router.get("/contacts", async (req, res): Promise<any> => {
       name: true,
     },
   });
-  console.log(currUser);
   const roomsList = await prismaClient.room.findMany({
     where: {
       OR: [
