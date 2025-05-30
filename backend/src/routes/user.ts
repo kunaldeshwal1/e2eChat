@@ -103,10 +103,8 @@ router.get("/", auth, async (req, res): Promise<any> => {
     },
   });
 
-  // const availableUsers = [];
-  const roomPattern = "%" + myUserId + "%";
+  // const roomPattern = "%" + myUserId + "%";
   const rooms = await prismaClient.room.findMany({
-    // If your room IDs are always sorted, you can do this:
     where: {
       id: {
         contains: myUserId,
@@ -117,10 +115,7 @@ router.get("/", auth, async (req, res): Promise<any> => {
     },
   });
 
-  // 3. Build a Set of roomIds for quick existence check
   const existingRoomIds = new Set(rooms.map((room) => room.id));
-
-  // 4. Find available users
   const availableUsers = [];
   for (const user of users) {
     const ids = [myUserId, user.id].sort();
