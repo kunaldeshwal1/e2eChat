@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -21,16 +21,9 @@ type UserCardProps = {
   name: string;
 };
 export default function Usercard({ id, name }: UserCardProps) {
-  // const [privateRoomId, setPrivateRoomId] = useState("");
-  // useEffect(() => {
-  //   const currUser = localStorage.getItem("currUsername");
-
-  //   const userArr = [name, currUser].sort().join("_");
-  //   setPrivateRoomId(userArr);
-  // }, [name]);
-  const currUser = localStorage.getItem("currUsername");
   const router = useRouter();
   const handleClick = async function (e: React.MouseEvent<HTMLButtonElement>) {
+    console.log(name, id);
     e.preventDefault();
     if (!name) return;
     try {
@@ -38,21 +31,14 @@ export default function Usercard({ id, name }: UserCardProps) {
         method: "POST",
         credentials: "include",
         body: JSON.stringify({
-          person_one: currUser,
           person_two: name,
           person_two_id: id,
-          // privateRoom: privateRoomId,
         }),
         headers: {
           "Content-type": "application/json",
         },
       });
-      const key = await generateKey();
-      const exportKey = await exportCryptoKey(key);
-      // localStorage.setItem("privateRoomId", privateRoomId);
-      // localStorage.setItem("keyBuffer", exportKey);
-      // socket.emit("join-room", { privateRoomId, key: exportKey });
-      router.push("/privatechat");
+      router.push("/mycontacts");
     } catch (error) {
       console.error("Error generating key:", error);
     }

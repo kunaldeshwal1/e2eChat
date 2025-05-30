@@ -27,9 +27,13 @@ export default async function Users() {
   await new Promise((res) => setTimeout(res, 1000));
   return (
     <div className="flex flex-col gap-1 items-center  justify-center h-[80dvh]">
-      {users.map((user) => (
-        <Usercard key={user.id} id={user.id} name={user.name} />
-      ))}
+      {users.length ? (
+        users.map((user) => (
+          <Usercard key={user.id} id={user.id} name={user.name} />
+        ))
+      ) : (
+        <div>No new users are here </div>
+      )}
     </div>
   );
 }

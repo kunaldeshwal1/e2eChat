@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { generateKey, exportCryptoKey } from "@/lib/crypto";
-
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -20,9 +20,10 @@ type Props = {
   session: string | undefined;
 };
 export default function Inputcard({ session }: Props) {
+  const router = useRouter();
   const [roomName, setRoomName] = useState("");
   const createRoom = async () => {
-    fetch(`${server}/api/v1/room/public`, {
+    await fetch(`${server}/api/v1/room/public`, {
       method: "POST",
       credentials: "include",
       body: JSON.stringify({
@@ -33,6 +34,7 @@ export default function Inputcard({ session }: Props) {
         "Content-type": "application/json",
       },
     });
+    router.refresh();
   };
 
   return (

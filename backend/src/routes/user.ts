@@ -95,22 +95,27 @@ router.get("/", auth, async (req, res): Promise<any> => {
 
   const users = await prismaClient.user.findMany({
     where: {
-      NOT: {
-        id: customReq.user?.userId,
-      },
+      id: { not: customReq.user.userId },
     },
     select: {
       id: true,
       name: true,
     },
   });
-  if (!users.length) {
-    return res.json({
-      message: "No user present in the db",
+
+  const availableUsers = [];
+  for (const user of users) {
+    const ids = [customReq.user.userId, user.id].sort();
+    const roomId = ids.join("_");
+    const room = await prismaClient.room.findUnique({
+      where: { id: roomId },
     });
+    if (!room) {
+      availableUsers.push(user);
+    }
   }
   res.json({
-    allUsers: users,
+    allUsers: availableUsers,
   });
 });
 

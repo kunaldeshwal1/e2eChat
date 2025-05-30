@@ -49,11 +49,26 @@ router.post("/private", async (req, res): Promise<any> => {
       message: "There is some issue in generating new private room id.",
     });
   }
-  const roomId = [body.person_one, body.person_two].sort().join("_");
+
+  const roomId = [customReq.user.userId, body.person_two_id].sort().join("_");
+  console.log("roomid is here", roomId);
+  const isRoomExists = await prismaClient.room.findUnique({
+    where: {
+      id: roomId,
+    },
+  });
+  console.log("Is room exists", isRoomExists);
+  if (isRoomExists) {
+    res.status(409).json({
+      message: "These guys are already in each other's contact list",
+    });
+    return;
+  }
+
   const privateRoom = await prismaClient.room.create({
     data: {
       id: roomId,
-      name: "private_room",
+      name: body.person_two,
       type: "private",
       users: {
         connect: [{ id: customReq.user?.userId }, { id: body.person_two_id }],
@@ -77,13 +92,9 @@ router.get("/", async (req, res) => {
       type: "public",
     },
   });
-  if (rooms.length <= 0) {
-    res.status(204).json({
-      message: "No room available",
-    });
-  }
   res.status(200).json({
     allGroups: rooms,
+    message: rooms.length ? undefined : "No room available",
   });
 });
 
@@ -103,10 +114,10 @@ router.get("/contacts", async (req, res): Promise<any> => {
       OR: [
         {
           id: {
-            startsWith: currUser?.name,
+            startsWith: currUserId,
           },
         },
-        { id: { endsWith: currUser?.name } },
+        { id: { endsWith: currUserId } },
       ],
     },
   });

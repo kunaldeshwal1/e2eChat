@@ -29,14 +29,18 @@ export default async function Dashboard() {
   return (
     <div>
       <div className="grid grid-cols-4 gap-4 ">
-        {groups.map((group) => (
-          <Groupcard
-            key={group.id}
-            id={group.id}
-            name={group.name}
-            type={group.type}
-          />
-        ))}
+        {groups.length > 0 ? (
+          groups.map((group) => (
+            <Groupcard
+              key={group.id}
+              id={group.id}
+              name={group.name}
+              type={group.type}
+            />
+          ))
+        ) : (
+          <div>No groups available</div>
+        )}
       </div>
       <div className="flex justify-center">
         <Inputcard session={session?.value} />

@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 export const RegisterSchema = z.object({
   email: z.string(),
   password: z.string().min(8),
@@ -14,7 +13,6 @@ export const RoomSchema = z.object({
   name: z.string().min(3),
 });
 export const PrivateRoom = z.object({
-  person_one: z.string(),
   person_two: z.string(),
   person_two_id: z.string(),
 });
