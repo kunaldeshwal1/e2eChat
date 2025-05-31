@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
+import dotenv from "dotenv";
+dotenv.config();
+const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
 interface ChatMessage {
   text: string;
@@ -96,10 +99,21 @@ export default function Chat() {
 
     try {
       const encryptedMsg = await encryptMessage(message, encryptionKey);
+      await fetch(`${serverUrl}/api/v1/message/group_chat`, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({
+          encryptedContent: encryptedMsg,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       socket.emit("groupMessage", {
         roomId: roomId,
         message: encryptedMsg,
       });
+
       setMessages((prev) => [...prev, { text: message, type: "outgoing" }]);
       setMessage("");
     } catch (error) {

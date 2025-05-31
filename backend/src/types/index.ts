@@ -16,3 +16,9 @@ export const PrivateRoom = z.object({
   person_two: z.string(),
   person_two_id: z.string(),
 });
+export const MessageSchema = z.object({
+  encryptedContent: z.object({
+    iv: z.array(z.number()),
+    ciphertext: z.array(z.number()),
+  }),
+});
