@@ -12,6 +12,7 @@ export type Group = {
   id: string;
   name: string;
   type: string;
+  createdById: string;
 };
 type AllGroupResponse = {
   allGroups: Group[];
@@ -36,6 +37,7 @@ export default async function Dashboard() {
               id={group.id}
               name={group.name}
               type={group.type}
+              createdById={group.createdById}
             />
           ))
         ) : (

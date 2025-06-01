@@ -11,6 +11,7 @@ export const LoginSchema = z.object({
 
 export const RoomSchema = z.object({
   name: z.string().min(3),
+  createdById: z.string().optional(),
 });
 export const PrivateRoom = z.object({
   person_one: z.string(),

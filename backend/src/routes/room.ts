@@ -29,6 +29,7 @@ router.post("/public", async (req, res): Promise<any> => {
       users: {
         connect: { id: customReq.user?.userId },
       },
+      createdById: customReq.user.userId,
     },
   });
   if (!room) {
@@ -128,4 +129,24 @@ router.get("/contacts", async (req, res): Promise<any> => {
   });
 });
 
+router.delete("/public/:id", async (req, res): Promise<any> => {
+  console.log("this ran here");
+  const customReq = req as unknown as CustomRequest;
+  const { id } = req.params;
+  console.log(id);
+  const userId = customReq.user?.userId;
+  const room = await prismaClient.room.findUnique({
+    where: { id: id, type: "public" },
+  });
+  if (!room) return res.status(404).json({ message: "Room not found" });
+
+  if (room.createdById && room.createdById !== userId) {
+    return res
+      .status(403)
+      .json({ message: "You do not have permission to delete this group." });
+  }
+
+  await prismaClient.room.delete({ where: { id: id } });
+  res.status(204).send();
+});
 export const roomRouter = router;

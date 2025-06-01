@@ -18,6 +18,7 @@ model User {
   password String
   messages Message[]
   rooms    Room[]   
+  createdRooms Room[]  @relation("CreatedRooms")
 }
 
 model Message {
@@ -36,4 +37,6 @@ model Room {
   type     RoomType     @default(public)
   content Message[]
   users    User[]  
+  createdBy  User?      @relation("CreatedRooms", fields: [createdById], references: [id])
+  createdById String?
 }

@@ -14,15 +14,27 @@ import { socket } from "@/lib/socket";
 import { useRouter } from "next/navigation";
 import { generateKey, exportCryptoKey } from "@/lib/crypto";
 import { Group } from "@/app/dashboard/page";
-
+import dotenv from "dotenv";
+dotenv.config();
+const server = process.env.NEXT_PUBLIC_SERVER_URL;
 type GroupcardProps = {
   id: string;
   name: string;
   type: string;
+  createdById: string;
 };
 
-export default function Groupcard({ id, name, type }: GroupcardProps) {
+export default function Groupcard({
+  id,
+  name,
+  type,
+  createdById,
+}: GroupcardProps) {
   const router = useRouter();
+  const [currUserId, setCurrUserId] = useState<string | null>("");
+  useEffect(() => {
+    setCurrUserId(localStorage.getItem("currUserId"));
+  }, []);
   const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (!id) return;
@@ -36,6 +48,13 @@ export default function Groupcard({ id, name, type }: GroupcardProps) {
     } catch (error) {
       console.error("Error generating key:", error);
     }
+  };
+  const handleDelete = async () => {
+    await fetch(`${server}/api/v1/room/public/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    router.refresh();
   };
   return (
     <Card className="w-[350px] ">
@@ -51,6 +70,9 @@ export default function Groupcard({ id, name, type }: GroupcardProps) {
       </CardHeader>
       <CardFooter className="flex justify-between">
         <Button onClick={handleClick}>Group Chat</Button>
+        {currUserId === createdById ? (
+          <Button onClick={handleDelete}>Delete</Button>
+        ) : null}
       </CardFooter>
     </Card>
   );
