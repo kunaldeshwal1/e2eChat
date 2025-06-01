@@ -68,7 +68,7 @@ router.post("/private", async (req, res): Promise<any> => {
   const privateRoom = await prismaClient.room.create({
     data: {
       id: roomId,
-      name: body.person_two,
+      name: body.person_two + "_" + body.person_one,
       type: "private",
       users: {
         connect: [{ id: customReq.user?.userId }, { id: body.person_two_id }],
@@ -112,12 +112,8 @@ router.get("/contacts", async (req, res): Promise<any> => {
   const roomsList = await prismaClient.room.findMany({
     where: {
       OR: [
-        {
-          id: {
-            startsWith: currUserId,
-          },
-        },
-        { id: { endsWith: currUserId } },
+        { id: { startsWith: currUserId + "_" } },
+        { id: { endsWith: "_" + currUserId } },
       ],
     },
   });
@@ -126,6 +122,7 @@ router.get("/contacts", async (req, res): Promise<any> => {
       message: "Something went wrong white finding user contacts",
     });
   }
+  console.log(roomsList);
   res.status(200).json({
     myRooms: roomsList,
   });

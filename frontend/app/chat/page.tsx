@@ -27,18 +27,52 @@ export default function Chat() {
   const [loading, setLoading] = useState(true);
 
   const keyBufferRef = useRef<string | null>(null);
+
   useEffect(() => {
+    const currUserId = localStorage.getItem("currUserId");
     const roomId = localStorage.getItem("roomId");
     const keyBuffer = localStorage.getItem("keyBuffer");
-    const saved = localStorage.getItem("chatMessage");
-    if (saved) {
+    keyBufferRef.current = keyBuffer;
+    async function getMessages() {
+      await new Promise((res) => setTimeout(res, 1000));
+
+      if (!keyBufferRef.current) return;
       try {
-        setMessages(JSON.parse(saved));
+        const key = await importSecretKey(keyBufferRef.current);
+
+        const response = await fetch(
+          `${serverUrl}/api/v1/message/group_chat?roomId=${roomId}`,
+          {
+            credentials: "include",
+          }
+        );
+        const data = await response.json();
+        data.map(async (msg: any) => {
+          const message = JSON.stringify(msg.content);
+          const decryptedMsg = await decryptMessage(message, key);
+          setMessages((prev) => [
+            ...prev,
+            {
+              text: decryptedMsg,
+              type: msg.senderId === currUserId ? "incoming" : "outgoing",
+            },
+          ]);
+        });
       } catch (e) {
-        setMessages([]);
+        console.error("some error occured", e);
       }
     }
-    keyBufferRef.current = keyBuffer;
+    getMessages();
+
+    // const saved = localStorage.getItem("chatMessage");
+
+    // if (saved) {
+    //   try {
+    //     setMessages(JSON.parse(saved));
+    //   } catch (e) {
+    //     setMessages([]);
+    //   }
+    // }
     if (roomId) {
       socket.emit("join-room", { roomId, key: keyBuffer });
     }
@@ -103,6 +137,7 @@ export default function Chat() {
         method: "POST",
         credentials: "include",
         body: JSON.stringify({
+          roomId: roomId,
           encryptedContent: encryptedMsg,
         }),
         headers: {

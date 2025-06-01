@@ -26,9 +26,13 @@ export default async function MyContact() {
   await new Promise((res) => setTimeout(res, 1000));
   return (
     <div className="flex flex-col gap-1 items-center  justify-center h-[80dvh]">
-      {rooms.map((room, i) => (
-        <ContactCard key={i} id={room.id} name={room.name} />
-      ))}
+      {rooms.length ? (
+        rooms.map((room, i) => (
+          <ContactCard key={i} id={room.id} name={room.name} />
+        ))
+      ) : (
+        <div>No users in contact list</div>
+      )}
     </div>
   );
 }

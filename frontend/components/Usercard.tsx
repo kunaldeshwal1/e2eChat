@@ -23,7 +23,7 @@ type UserCardProps = {
 export default function Usercard({ id, name }: UserCardProps) {
   const router = useRouter();
   const handleClick = async function (e: React.MouseEvent<HTMLButtonElement>) {
-    console.log(name, id);
+    const currUserName = localStorage.getItem("currUsername");
     e.preventDefault();
     if (!name) return;
     try {
@@ -31,6 +31,7 @@ export default function Usercard({ id, name }: UserCardProps) {
         method: "POST",
         credentials: "include",
         body: JSON.stringify({
+          person_one: currUserName,
           person_two: name,
           person_two_id: id,
         }),

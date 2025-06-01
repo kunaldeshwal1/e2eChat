@@ -21,7 +21,6 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
     const decoded = jwt.verify(token, JWT_SECRET as string) as MyJWTPayload;
 
     (req as CustomRequest).user = decoded;
-    console.log(decoded);
     next();
   } catch (err) {
     res.status(401).send("Please authenticate");

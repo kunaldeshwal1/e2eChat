@@ -10,7 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-
+import dotenv from "dotenv";
+dotenv.config();
+const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 interface ChatMessage {
   text: string;
   type: "incoming" | "outgoing";
@@ -27,15 +29,48 @@ export default function Privatechat() {
   useEffect(() => {
     const roomId = localStorage.getItem("privateRoomId");
     const keyBuffer = localStorage.getItem("keyBuffer");
-    const saved = localStorage.getItem("privateChatMessage");
-    if (saved) {
+    const currUserId = localStorage.getItem("currUserId");
+
+    // const saved = localStorage.getItem("privateChatMessage");
+    // if (saved) {
+    //   try {
+    //     setMessages(JSON.parse(saved));
+    //   } catch (e) {
+    //     setMessages([]);
+    //   }
+    // }
+    keyBufferRef.current = keyBuffer;
+    async function getMessages() {
+      await new Promise((res) => setTimeout(res, 1000));
+
+      if (!keyBufferRef.current) return;
       try {
-        setMessages(JSON.parse(saved));
+        const key = await importSecretKey(keyBufferRef.current);
+
+        const response = await fetch(
+          `${serverUrl}/api/v1/message/private_chat?roomId=${roomId}`,
+          {
+            credentials: "include",
+          }
+        );
+        const data = await response.json();
+        data.map(async (msg: any) => {
+          const message = JSON.stringify(msg.content);
+          const decryptedMsg = await decryptMessage(message, key);
+          setMessages((prev) => [
+            ...prev,
+            {
+              text: decryptedMsg,
+              type: msg.senderId === currUserId ? "incoming" : "outgoing",
+            },
+          ]);
+        });
       } catch (e) {
-        setMessages([]);
+        console.error("some error occured", e);
       }
     }
-    keyBufferRef.current = keyBuffer;
+    getMessages();
+
     if (roomId) {
       socket.emit("join-room", { roomId, key: keyBuffer });
     }
@@ -96,6 +131,17 @@ export default function Privatechat() {
 
     try {
       const encryptedMsg = await encryptMessage(message, encryptionKey);
+      await fetch(`${serverUrl}/api/v1/message/private_chat`, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({
+          roomId: roomId,
+          encryptedContent: encryptedMsg,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       socket.emit("groupMessage", {
         roomId: roomId,
         message: encryptedMsg,

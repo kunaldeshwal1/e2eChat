@@ -54,8 +54,6 @@ export async function decryptMessage(
   key: CryptoKey
 ): Promise<string> {
   const { iv, ciphertext } = JSON.parse(encryptedData);
-  console.log(encryptedData);
-
   const decrypted = await window.crypto.subtle.decrypt(
     {
       name: "AES-GCM",

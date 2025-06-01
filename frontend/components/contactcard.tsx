@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -19,6 +19,16 @@ type contactCardProps = {
 };
 export default function ContactCard({ id, name }: contactCardProps) {
   const router = useRouter();
+  const [currUserName, setCurrUserName] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCurrUserName(localStorage.getItem("currUsername"));
+  }, []);
+
+  if (!currUserName) return <div>loading...</div>; // skip until loaded
+
+  const groupName = name.split("_");
+  name = groupName[0] === currUserName ? groupName[1] : groupName[0];
   const handleClick = async function (e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     try {

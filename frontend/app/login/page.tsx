@@ -28,6 +28,7 @@ export default function Login() {
     const data = await response.json();
     console.log(data);
     localStorage.setItem("currUsername", data.name);
+    localStorage.setItem("currUserId", data.id);
     setEmail("");
     setPassword("");
     if (response.ok) router.push("/");

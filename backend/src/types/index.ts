@@ -13,10 +13,12 @@ export const RoomSchema = z.object({
   name: z.string().min(3),
 });
 export const PrivateRoom = z.object({
+  person_one: z.string(),
   person_two: z.string(),
   person_two_id: z.string(),
 });
 export const MessageSchema = z.object({
+  roomId: z.string().min(3),
   encryptedContent: z.object({
     iv: z.array(z.number()),
     ciphertext: z.array(z.number()),
