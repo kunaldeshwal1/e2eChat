@@ -30,15 +30,6 @@ export default function Privatechat() {
     const roomId = localStorage.getItem("privateRoomId");
     const keyBuffer = localStorage.getItem("keyBuffer");
     const currUserId = localStorage.getItem("currUserId");
-
-    // const saved = localStorage.getItem("privateChatMessage");
-    // if (saved) {
-    //   try {
-    //     setMessages(JSON.parse(saved));
-    //   } catch (e) {
-    //     setMessages([]);
-    //   }
-    // }
     keyBufferRef.current = keyBuffer;
     async function getMessages() {
       await new Promise((res) => setTimeout(res, 1000));
@@ -75,7 +66,7 @@ export default function Privatechat() {
       socket.emit("join-room", { roomId, key: keyBuffer });
     }
     if (!roomId || !keyBuffer) {
-      router.push("/");
+      router.push("/mycontacts");
       return;
     }
     setLoading(false);
@@ -200,7 +191,7 @@ export default function Privatechat() {
               socket.emit("leavePrivateChat", {
                 roomId,
               });
-              router.push("/dashboard");
+              router.push("/mycontacts");
             }}
           >
             Exit Room

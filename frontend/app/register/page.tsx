@@ -42,25 +42,33 @@ export default function Register() {
             else alert("Not registered");
           }}
         >
-          <Label htmlFor="name">Email</Label>
-          <Input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <Label htmlFor="name">Name</Label>
-          <Input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <Label htmlFor="name">Password</Label>
-          <Input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <Button type="submit">Sign up</Button>
+          <div className="flex flex-col gap-2">
+            <div>
+              <Label htmlFor="name">Email</Label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="name">Name</Label>
+              <Input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="name">Password</Label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <Button type="submit">Sign up</Button>
+          </div>
         </form>
       </Card>
     </div>

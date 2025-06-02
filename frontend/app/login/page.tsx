@@ -42,19 +42,25 @@ export default function Login() {
       <Card className="w-[50%] p-5">
         <CardTitle>Please Login</CardTitle>
         <form onSubmit={handleSubmit}>
-          <Label htmlFor="name">Email</Label>
-          <Input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <Label htmlFor="name">Password</Label>
-          <Input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <Button type="submit">Login</Button>
+          <div className="flex flex-col gap-2">
+            <div>
+              <Label htmlFor="name">Email</Label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="name">Password</Label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <Button type="submit">Login</Button>
+          </div>
         </form>
         {errMessage && <Label className="text-red-800">{errMessage}</Label>}
       </Card>

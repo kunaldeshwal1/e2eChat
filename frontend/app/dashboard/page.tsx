@@ -29,7 +29,8 @@ export default async function Dashboard() {
   const groups: Group[] = data.allGroups;
   return (
     <div>
-      <div className="grid grid-cols-4 gap-4 ">
+      <div className="">
+        <h1>List of available groups</h1>
         {groups.length > 0 ? (
           groups.map((group) => (
             <Groupcard
