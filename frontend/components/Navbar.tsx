@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useUser } from "@/app/userContext";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import dotenv from "dotenv";
@@ -8,6 +9,7 @@ import { useRouter } from "next/navigation";
 dotenv.config();
 const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 export default function Navbar() {
+  const { currUserName, setCurrUserName } = useUser();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -58,14 +60,16 @@ export default function Navbar() {
             Home
           </Link>
         </li>
-        <li>
-          <Link
-            href="/chat"
-            className={`${pathname === "/chat" ? "text-gray-400" : ""}`}
-          >
-            Chat
-          </Link>
-        </li>
+        {currUserName && (
+          <li>
+            <Link
+              href="/chat"
+              className={`${pathname === "/chat" ? "text-gray-400" : ""}`}
+            >
+              Chat
+            </Link>
+          </li>
+        )}
         <li>
           <Link
             href="/register"
@@ -79,6 +83,8 @@ export default function Navbar() {
                 method: "POST",
                 credentials: "include",
               });
+              localStorage.clear();
+              setCurrUserName(null);
               router.push("/login");
             }}
           >

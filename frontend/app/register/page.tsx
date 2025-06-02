@@ -38,7 +38,7 @@ export default function Register() {
             setEmail("");
             setPassword("");
             setName("");
-            if (response.ok) router.push("/");
+            if (response.ok) router.push("/login");
             else alert("Not registered");
           }}
         >

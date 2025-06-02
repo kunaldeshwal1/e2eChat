@@ -5,10 +5,12 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
+import { useUser } from "../userContext";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errMessage, setErrMessage] = useState("");
+  const { setCurrUserName } = useUser();
   const router = useRouter();
   const handleSubmit = async function (e: any) {
     e.preventDefault();
@@ -29,6 +31,7 @@ export default function Login() {
     console.log(data);
     localStorage.setItem("currUsername", data.name);
     localStorage.setItem("currUserId", data.id);
+    setCurrUserName(data.name);
     setEmail("");
     setPassword("");
     if (response.ok) router.push("/");
