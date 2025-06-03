@@ -35,7 +35,7 @@ router.get("/group_chat", async (req, res): Promise<any> => {
     orderBy: { createdAt: "asc" },
   });
 
-  res.json(messages);
+  res.status(200).json(messages);
 });
 
 router.post("/private_chat", async (req, res): Promise<any> => {

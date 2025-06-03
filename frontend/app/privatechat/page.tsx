@@ -24,8 +24,15 @@ export default function Privatechat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [encryptionKey, setEncryptionKey] = useState<CryptoKey | null>(null);
   const [loading, setLoading] = useState(true);
+  const messageEndRef = useRef<HTMLDivElement | null>(null);
 
   const keyBufferRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
   useEffect(() => {
     const roomId = localStorage.getItem("privateRoomId");
     const keyBuffer = localStorage.getItem("keyBuffer");
@@ -48,11 +55,12 @@ export default function Privatechat() {
         data.map(async (msg: any) => {
           const message = JSON.stringify(msg.content);
           const decryptedMsg = await decryptMessage(message, key);
+          console.log(decryptedMsg);
           setMessages((prev) => [
             ...prev,
             {
               text: decryptedMsg,
-              type: msg.senderId === currUserId ? "incoming" : "outgoing",
+              type: msg.senderId === currUserId ? "outgoing" : "incoming",
             },
           ]);
         });
@@ -170,6 +178,7 @@ export default function Privatechat() {
               </div>
             </div>
           ))}
+          <div ref={messageEndRef}></div>
         </div>
 
         <div className="input-container flex gap-2 p-4 border-t">

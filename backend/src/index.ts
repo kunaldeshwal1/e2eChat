@@ -7,7 +7,7 @@ import cookieParser from "cookie-parser";
 import { auth } from "./authMiddleware";
 import { messageRouter } from "./routes/message";
 import { roomRouter } from "./routes/room";
-
+import fs from "fs";
 const PORT = 4000;
 
 const app = express();
@@ -25,8 +25,20 @@ const io = new Server(httpServer, {
     methods: ["GET", "POST"],
   },
 });
+const roomKeysPath = "roomKeys.json";
 
-const roomKeys = new Map<string, string>();
+let roomKeys = new Map<string, string>();
+if (fs.existsSync(roomKeysPath)) {
+  roomKeys = new Map(JSON.parse(fs.readFileSync(roomKeysPath, "utf-8")));
+}
+
+// Save keys after any change
+function saveRoomKeys() {
+  fs.writeFileSync(
+    roomKeysPath,
+    JSON.stringify(Array.from(roomKeys.entries()))
+  );
+}
 
 io.on("connection", (socket) => {
   console.log(`Socket connected: ${socket.id}`);
@@ -38,6 +50,7 @@ io.on("connection", (socket) => {
 
       if (!roomKeys.has(roomId) && key) {
         roomKeys.set(roomId, key);
+        saveRoomKeys();
       }
       socket.emit("share-key", roomKeys.get(roomId));
       io.to(roomId).emit("user joined", `A user joined room ${roomId}`);

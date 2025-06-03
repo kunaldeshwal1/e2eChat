@@ -9,11 +9,11 @@ import { useRouter } from "next/navigation";
 dotenv.config();
 const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 export default function Navbar() {
-  const { currUserName, setCurrUserName } = useUser();
+  const { currentUserName, setCurrentUserName } = useUser();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  console.log(pathname);
   const router = useRouter();
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
@@ -23,6 +23,7 @@ export default function Navbar() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+  if (currentUserName === undefined) return null;
   return (
     <div className="flex justify-between h-24 bg-gray-900 text-[#fff]">
       <div className="flex items-center pl-2">
@@ -57,7 +58,7 @@ export default function Navbar() {
           } transition-all`}
           onClick={() => setOpen(false)}
         >
-          {currUserName ? (
+          {currentUserName ? (
             <li className="flex gap-8 items-center">
               <Link
                 href="/chat"
@@ -95,7 +96,7 @@ export default function Navbar() {
                     credentials: "include",
                   });
                   localStorage.clear();
-                  setCurrUserName(null);
+                  setCurrentUserName(null);
                   router.push("/login");
                 }}
               >

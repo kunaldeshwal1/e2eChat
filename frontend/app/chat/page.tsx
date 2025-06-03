@@ -25,9 +25,13 @@ export default function Chat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [encryptionKey, setEncryptionKey] = useState<CryptoKey | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const messageEndRef = useRef<HTMLDivElement | null>(null);
   const keyBufferRef = useRef<string | null>(null);
-
+  useEffect(() => {
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
   useEffect(() => {
     const currUserId = localStorage.getItem("currUserId");
     const roomId = localStorage.getItem("roomId");
@@ -49,12 +53,14 @@ export default function Chat() {
         const data = await response.json();
         data.map(async (msg: any) => {
           const message = JSON.stringify(msg.content);
+          console.log(typeof message);
           const decryptedMsg = await decryptMessage(message, key);
+          console.log(msg.senderId === currUserId);
           setMessages((prev) => [
             ...prev,
             {
               text: decryptedMsg,
-              type: msg.senderId === currUserId ? "incoming" : "outgoing",
+              type: msg.senderId === currUserId ? "outgoing" : "incoming",
             },
           ]);
         });
@@ -63,16 +69,6 @@ export default function Chat() {
       }
     }
     getMessages();
-
-    // const saved = localStorage.getItem("chatMessage");
-
-    // if (saved) {
-    //   try {
-    //     setMessages(JSON.parse(saved));
-    //   } catch (e) {
-    //     setMessages([]);
-    //   }
-    // }
     if (roomId) {
       socket.emit("join-room", { roomId, key: keyBuffer });
     }
@@ -133,6 +129,7 @@ export default function Chat() {
 
     try {
       const encryptedMsg = await encryptMessage(message, encryptionKey);
+
       await fetch(`${serverUrl}/api/v1/message/group_chat`, {
         method: "POST",
         credentials: "include",
@@ -181,6 +178,7 @@ export default function Chat() {
               </div>
             </div>
           ))}
+          <div ref={messageEndRef}></div>
         </div>
 
         <div className="input-container flex gap-2 p-4 border-t">

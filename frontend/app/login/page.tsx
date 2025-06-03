@@ -10,7 +10,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errMessage, setErrMessage] = useState("");
-  const { setCurrUserName } = useUser();
+  const { setCurrentUserName } = useUser();
   const router = useRouter();
   const handleSubmit = async function (e: any) {
     e.preventDefault();
@@ -28,10 +28,12 @@ export default function Login() {
       },
     });
     const data = await response.json();
-    console.log(data);
-    localStorage.setItem("currUsername", data.name);
-    localStorage.setItem("currUserId", data.id);
-    setCurrUserName(data.name);
+    console.log("this is data", data);
+    if (data) {
+      localStorage.setItem("currUsername", data.name);
+      localStorage.setItem("currUserId", data.id);
+      setCurrentUserName(data.name);
+    }
     setEmail("");
     setPassword("");
     if (response.ok) router.push("/");

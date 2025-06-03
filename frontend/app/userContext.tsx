@@ -2,25 +2,31 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 
 type UserContextType = {
-  currUserName: string | null;
-  setCurrUserName: (name: string | null) => void;
+  currentUserName: string | null;
+  setCurrentUserName: (name: string | null) => void;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const [currUserName, setCurrUserName] = useState<string | null>(() =>
-    typeof window !== "undefined" ? localStorage.getItem("currUsername") : null
-  );
+  const [currentUserName, setCurrentUserName] = useState<string | null>(null);
 
   useEffect(() => {
-    const handler = () => setCurrUserName(localStorage.getItem("currUsername"));
+    setCurrentUserName(localStorage.getItem("currUsername"));
+    const handler = () =>
+      setCurrentUserName(localStorage.getItem("currUsername"));
+    window.addEventListener("storage", handler);
+    return () => window.removeEventListener("storage", handler);
+  }, []);
+  useEffect(() => {
+    const handler = () =>
+      setCurrentUserName(localStorage.getItem("currUsername"));
     window.addEventListener("storage", handler);
     return () => window.removeEventListener("storage", handler);
   }, []);
 
   return (
-    <UserContext.Provider value={{ currUserName, setCurrUserName }}>
+    <UserContext.Provider value={{ currentUserName, setCurrentUserName }}>
       {children}
     </UserContext.Provider>
   );
