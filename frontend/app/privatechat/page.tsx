@@ -16,9 +16,11 @@ const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 interface ChatMessage {
   text: string;
   type: "incoming" | "outgoing";
+  id: number;
 }
 
 export default function Privatechat() {
+  const tempId = Date.now();
   const router = useRouter();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -27,7 +29,7 @@ export default function Privatechat() {
   const messageEndRef = useRef<HTMLDivElement | null>(null);
 
   const keyBufferRef = useRef<string | null>(null);
-
+  const shownMessageIds = useRef(new Set());
   useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -53,6 +55,8 @@ export default function Privatechat() {
         );
         const data = await response.json();
         data.map(async (msg: any) => {
+          if (shownMessageIds.current.has(msg.id)) return; // Already shown
+          shownMessageIds.current.add(msg.id);
           const message = JSON.stringify(msg.content);
           const decryptedMsg = await decryptMessage(message, key);
           console.log(decryptedMsg);
@@ -61,6 +65,7 @@ export default function Privatechat() {
             {
               text: decryptedMsg,
               type: msg.senderId === currUserId ? "outgoing" : "incoming",
+              id: msg.id,
             },
           ]);
         });
@@ -84,13 +89,16 @@ export default function Privatechat() {
       .catch((error) => console.error("Error importing key:", error));
 
     const handleMessage = async (encryptedMsg: any) => {
+      const msgId = encryptedMsg.id; // Get the id field from your socket, or use a combo (timestamp+sender)
+      if (shownMessageIds.current.has(msgId)) return; // Already shown
+      shownMessageIds.current.add(msgId);
       if (!keyBufferRef.current) return;
       try {
         const key = await importSecretKey(keyBufferRef.current);
         const decryptedMsg = await decryptMessage(encryptedMsg, key);
         setMessages((prev) => [
           ...prev,
-          { text: decryptedMsg, type: "incoming" },
+          { text: decryptedMsg, type: "incoming", id: msgId },
         ]);
       } catch (error) {
         console.error("Decryption error:", error);
@@ -145,7 +153,10 @@ export default function Privatechat() {
         roomId: roomId,
         message: encryptedMsg,
       });
-      setMessages((prev) => [...prev, { text: message, type: "outgoing" }]);
+      setMessages((prev) => [
+        ...prev,
+        { text: message, type: "outgoing", id: tempId },
+      ]);
       setMessage("");
     } catch (error) {
       console.error("Encryption error:", error);
