@@ -84,6 +84,7 @@ router.post("/login", async (req: Request, res: Response) => {
       secure: process.env.ENVIRONMENT === "production",
       sameSite: process.env.ENVIRONMENT === "production" ? "none" : "strict",
       // maxAge: 60 * 60 * 1000,
+      domain: "e2e-chat-phi.vercel.app",
     })
     .json({ message: "Logged in", id: user.id, name: user.name });
 });
