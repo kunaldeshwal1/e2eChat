@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-const serverUrl = process.env.BACKEND_URL;
+const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 export default function Register() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -21,20 +21,17 @@ export default function Register() {
             const currEmail = email;
             const currPassword = password;
             const currName = name;
-            const response = await fetch(
-              "http://localhost:4000/api/v1/user/register",
-              {
-                method: "POST",
-                body: JSON.stringify({
-                  email: currEmail,
-                  name: currName,
-                  password: currPassword,
-                }),
-                headers: {
-                  "Content-type": "application/json",
-                },
-              }
-            );
+            const response = await fetch(`${serverUrl}/api/v1/user/register`, {
+              method: "POST",
+              body: JSON.stringify({
+                email: currEmail,
+                name: currName,
+                password: currPassword,
+              }),
+              headers: {
+                "Content-type": "application/json",
+              },
+            });
             setEmail("");
             setPassword("");
             setName("");

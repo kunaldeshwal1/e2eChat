@@ -6,6 +6,8 @@ import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useUser } from "../userContext";
+const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,7 +18,7 @@ export default function Login() {
     e.preventDefault();
     const currEmail = email;
     const currPassword = password;
-    const response = await fetch("http://localhost:4000/api/v1/user/login", {
+    const response = await fetch(`${serverUrl}/api/v1/user/login`, {
       method: "POST",
       credentials: "include",
       body: JSON.stringify({
