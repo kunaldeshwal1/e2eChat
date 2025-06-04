@@ -17,7 +17,7 @@ app.use(cookieParser());
 const httpServer = createServer(app);
 app.use(
   cors({
-    origin: "https://e2e-chat-phi.vercel.app/",
+    origin: "https://e2e-chat-phi.vercel.app",
     credentials: true,
   })
 );
