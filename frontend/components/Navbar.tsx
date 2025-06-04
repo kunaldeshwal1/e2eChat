@@ -95,7 +95,8 @@ export default function Navbar() {
                     method: "POST",
                     credentials: "include",
                   });
-                  localStorage.clear();
+                  localStorage.removeItem("currUsername");
+                  localStorage.removeItem("currUserId");
                   setCurrentUserName(null);
                   router.push("/login");
                 }}
