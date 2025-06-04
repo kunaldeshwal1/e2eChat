@@ -22,6 +22,8 @@ app.use(
         ? "https://e2e-chat-phi.vercel.app"
         : "http://localhost:3000",
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 const io = new Server(httpServer, {
@@ -37,7 +39,6 @@ if (fs.existsSync(roomKeysPath)) {
   roomKeys = new Map(JSON.parse(fs.readFileSync(roomKeysPath, "utf-8")));
 }
 
-// Save keys after any change
 function saveRoomKeys() {
   fs.writeFileSync(
     roomKeysPath,

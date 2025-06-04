@@ -82,7 +82,7 @@ router.post("/login", async (req: Request, res: Response) => {
     .cookie("session", token, {
       httpOnly: false,
       secure: process.env.ENVIRONMENT === "production",
-      sameSite: "none",
+      sameSite: process.env.ENVIRONMENT === "production" ? "none" : "strict",
       // maxAge: 60 * 60 * 1000,
     })
     .json({ message: "Logged in", id: user.id, name: user.name });
