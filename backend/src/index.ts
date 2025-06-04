@@ -19,7 +19,7 @@ app.use(
   cors({
     origin: process.env.ENVIRONMENT
       ? "http://localhost:3000"
-      : "https://chatapp.vercel.app",
+      : "https://e2e-chat-phi.vercel.app/",
     credentials: true,
   })
 );
