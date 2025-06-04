@@ -1,9 +1,9 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { RoomSchema, PrivateRoom } from "../types";
 import { prismaClient } from "../prismaClient";
 import { CustomRequest } from "../authMiddleware";
 const router = express.Router();
-router.post("/public", async (req, res): Promise<any> => {
+router.post("/public", async (req: Request, res: Response) => {
   const body = req.body;
   console.log("this is room body", body);
   const customReq = req as CustomRequest;
@@ -33,16 +33,17 @@ router.post("/public", async (req, res): Promise<any> => {
     },
   });
   if (!room) {
-    return res.status(409).json({
+    res.status(409).json({
       message: "something went wrong",
     });
+    return;
   }
   res.status(200).json({
     rooms: room,
   });
 });
 
-router.post("/private", async (req, res): Promise<any> => {
+router.post("/private", async (req: Request, res: Response) => {
   const body = req.body;
   const customReq = req as CustomRequest;
   if (!PrivateRoom.parse(body)) {
@@ -77,9 +78,10 @@ router.post("/private", async (req, res): Promise<any> => {
     },
   });
   if (!privateRoom) {
-    return res.status(409).json({
+    res.status(409).json({
       message: "something went wrong",
     });
+    return;
   }
   res.status(200).json({
     privateRoom,
@@ -87,7 +89,7 @@ router.post("/private", async (req, res): Promise<any> => {
 });
 
 //get all public groups
-router.get("/", async (req, res) => {
+router.get("/", async (req: Request, res: Response) => {
   const rooms = await prismaClient.room.findMany({
     where: {
       type: "public",
@@ -99,7 +101,7 @@ router.get("/", async (req, res) => {
   });
 });
 
-router.get("/contacts", async (req, res): Promise<any> => {
+router.get("/contacts", async (req: Request, res: Response) => {
   const customReq = req as CustomRequest;
   const currUserId = customReq.user?.userId;
   const currUser = await prismaClient.user.findUnique({
@@ -119,9 +121,10 @@ router.get("/contacts", async (req, res): Promise<any> => {
     },
   });
   if (!roomsList) {
-    return res.status(409).json({
+    res.status(409).json({
       message: "Something went wrong white finding user contacts",
     });
+    return;
   }
   console.log(roomsList);
   res.status(200).json({
@@ -129,8 +132,7 @@ router.get("/contacts", async (req, res): Promise<any> => {
   });
 });
 
-router.delete("/public/:id", async (req, res): Promise<any> => {
-  console.log("this ran here");
+router.delete("/public/:id", async (req: Request, res: Response) => {
   const customReq = req as unknown as CustomRequest;
   const { id } = req.params;
   console.log(id);
@@ -138,10 +140,13 @@ router.delete("/public/:id", async (req, res): Promise<any> => {
   const room = await prismaClient.room.findUnique({
     where: { id: id, type: "public" },
   });
-  if (!room) return res.status(404).json({ message: "Room not found" });
+  if (!room) {
+    res.status(404).json({ message: "Room not found" });
+    return;
+  }
 
   if (room.createdById && room.createdById !== userId) {
-    return res
+    res
       .status(403)
       .json({ message: "You do not have permission to delete this group." });
   }

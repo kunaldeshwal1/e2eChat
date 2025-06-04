@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { RegisterSchema, LoginSchema } from "../types";
 import { prismaClient } from "../prismaClient";
 const router = express.Router();
@@ -13,7 +13,7 @@ if (!JWT_SECRET) {
   throw new Error("JWT_SECRET is not set in environment variables");
 }
 const saltRounds = 10;
-router.post("/register", async (req, res): Promise<any> => {
+router.post("/register", async (req: Request, res: Response) => {
   const body = req.body;
   console.log(body);
   if (!RegisterSchema.parse(body)) {
@@ -47,7 +47,7 @@ router.post("/register", async (req, res): Promise<any> => {
   });
 });
 //login
-router.post("/login", async (req, res) => {
+router.post("/login", async (req: Request, res: Response) => {
   const body = req.body;
   if (!LoginSchema.parse(body)) {
     res.status(406).json({
@@ -88,7 +88,7 @@ router.post("/login", async (req, res) => {
     .json({ message: "Logged in", id: user.id, name: user.name });
 });
 //allusers
-router.get("/", auth, async (req, res): Promise<any> => {
+router.get("/", auth, async (req: Request, res: Response) => {
   const customReq = req as CustomRequest;
   const myUserId = customReq.user.userId;
   const users = await prismaClient.user.findMany({
@@ -128,7 +128,7 @@ router.get("/", auth, async (req, res): Promise<any> => {
 });
 
 //logout
-router.post("/logout", async (req, res) => {
+router.post("/logout", async (req: Request, res: Response) => {
   res.clearCookie("session");
   res.json({
     message: "You've logged out!",

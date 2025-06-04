@@ -1,15 +1,16 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { prismaClient } from "../prismaClient";
 import { MessageSchema } from "../types";
 import { CustomRequest } from "../authMiddleware";
 import { Prisma } from "@prisma/client";
 const router = express.Router();
-router.get("/private_chat", async (req, res): Promise<any> => {
+router.get("/private_chat", async (req: Request, res: Response) => {
   const { roomId } = req.query;
   console.log(roomId);
 
   if (!roomId || typeof roomId !== "string") {
-    return res.status(400).json({ error: "roomId is required" });
+    res.status(400).json({ error: "roomId is required" });
+    return;
   }
 
   const messages = await prismaClient.message.findMany({
@@ -21,12 +22,13 @@ router.get("/private_chat", async (req, res): Promise<any> => {
   res.json(messages);
 });
 
-router.get("/group_chat", async (req, res): Promise<any> => {
+router.get("/group_chat", async (req: Request, res: Response) => {
   const { roomId } = req.query;
   console.log(roomId);
 
   if (!roomId || typeof roomId !== "string") {
-    return res.status(400).json({ error: "roomId is required" });
+    res.status(400).json({ error: "roomId is required" });
+    return;
   }
 
   const messages = await prismaClient.message.findMany({
@@ -38,7 +40,7 @@ router.get("/group_chat", async (req, res): Promise<any> => {
   res.status(200).json(messages);
 });
 
-router.post("/private_chat", async (req, res): Promise<any> => {
+router.post("/private_chat", async (req: Request, res: Response) => {
   const body = req.body;
   const customReq = req as CustomRequest;
   const currUserId = customReq.user?.userId;
@@ -46,9 +48,10 @@ router.post("/private_chat", async (req, res): Promise<any> => {
   const result = MessageSchema.safeParse(body);
   console.log(result.data);
   if (!result.success) {
-    return res.status(409).json({
+    res.status(409).json({
       message: "Message schema faild by zod issue occured on the server!",
     });
+    return;
   }
   const parsedContent = result.data?.encryptedContent;
   const parsedRoomId = result.data.roomId;
@@ -60,9 +63,9 @@ router.post("/private_chat", async (req, res): Promise<any> => {
       roomId: parsedRoomId,
     },
   });
-  return res.json({ message: "sent successfully" });
+  res.json({ message: "sent successfully" });
 });
-router.post("/group_chat", async (req, res): Promise<any> => {
+router.post("/group_chat", async (req: Request, res: Response) => {
   const body = req.body;
   const customReq = req as CustomRequest;
   const currUserId = customReq.user?.userId;
@@ -70,9 +73,10 @@ router.post("/group_chat", async (req, res): Promise<any> => {
   const result = MessageSchema.safeParse(body);
   console.log(result.data);
   if (!result.success) {
-    return res.status(409).json({
+    res.status(409).json({
       message: "Message schema faild by zod issue occured on the server!",
     });
+    return;
   }
   const parsedContent = result.data?.encryptedContent;
   const parsedRoomId = result.data.roomId;
@@ -84,7 +88,7 @@ router.post("/group_chat", async (req, res): Promise<any> => {
       roomId: parsedRoomId,
     },
   });
-  return res.json({ message: "sent successfully" });
+  res.json({ message: "sent successfully" });
 });
 
 export const messageRouter = router;
