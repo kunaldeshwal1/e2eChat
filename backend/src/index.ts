@@ -7,6 +7,8 @@ import cookieParser from "cookie-parser";
 import { auth } from "./authMiddleware";
 import { messageRouter } from "./routes/message";
 import { roomRouter } from "./routes/room";
+import dotenv from "dotenv";
+dotenv.config();
 import fs from "fs";
 const PORT = 4000;
 
@@ -15,7 +17,9 @@ app.use(cookieParser());
 const httpServer = createServer(app);
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.ENVIRONMENT
+      ? "http://localhost:3000"
+      : "https://chatapp.vercel.app",
     credentials: true,
   })
 );
