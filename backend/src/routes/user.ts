@@ -80,12 +80,17 @@ router.post("/login", async (req: Request, res: Response) => {
   res
     .status(200)
     .cookie("session", token, {
-      httpOnly: false,
-      secure: process.env.ENVIRONMENT === "production",
-      sameSite: process.env.ENVIRONMENT === "production" ? "none" : "strict",
-      // maxAge: 60 * 60 * 1000,
-      domain: "e2e-chat-phi.vercel.app",
+      httpOnly: true, // Should be true for security
+      secure: true,
+      sameSite: "none",
     })
+    // .cookie("session", token, {
+    //   httpOnly: false,
+    //   secure: process.env.ENVIRONMENT === "production",
+    //   sameSite: process.env.ENVIRONMENT === "production" ? "none" : "strict",
+    //   // maxAge: 60 * 60 * 1000,
+    //   domain: "e2e-chat-phi.vercel.app",
+    // })
     .json({ message: "Logged in", id: user.id, name: user.name });
 });
 //allusers
