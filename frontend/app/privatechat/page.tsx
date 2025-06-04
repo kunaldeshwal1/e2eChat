@@ -89,8 +89,8 @@ export default function Privatechat() {
       .catch((error) => console.error("Error importing key:", error));
 
     const handleMessage = async (encryptedMsg: any) => {
-      const msgId = encryptedMsg.id; // Get the id field from your socket, or use a combo (timestamp+sender)
-      if (shownMessageIds.current.has(msgId)) return; // Already shown
+      const msgId = encryptedMsg.id;
+      if (shownMessageIds.current.has(msgId)) return;
       shownMessageIds.current.add(msgId);
       if (!keyBufferRef.current) return;
       try {
