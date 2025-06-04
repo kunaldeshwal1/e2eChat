@@ -80,7 +80,7 @@ router.post("/login", async (req: Request, res: Response) => {
   res
     .status(200)
     .cookie("session", token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       // maxAge: 60 * 60 * 1000,
