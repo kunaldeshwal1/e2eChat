@@ -15,11 +15,11 @@ export interface CustomRequest extends Request {
 export const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.cookies.session;
+    console.log(token);
     if (!token) {
       throw new Error();
     }
     const decoded = jwt.verify(token, JWT_SECRET as string) as MyJWTPayload;
-
     (req as CustomRequest).user = decoded;
     next();
   } catch (err) {
