@@ -22,8 +22,8 @@ app.use(
         ? "https://e2e-chat-phi.vercel.app"
         : "http://localhost:3000",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+    // methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    // allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
   })
 );
 const io = new Server(httpServer, {
