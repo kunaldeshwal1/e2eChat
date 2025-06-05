@@ -59,7 +59,6 @@ export default function Privatechat() {
           shownMessageIds.current.add(msg.id);
           const message = JSON.stringify(msg.content);
           const decryptedMsg = await decryptMessage(message, key);
-          console.log(decryptedMsg);
           setMessages((prev) => [
             ...prev,
             {
