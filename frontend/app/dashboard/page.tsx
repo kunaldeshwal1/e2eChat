@@ -1,12 +1,11 @@
-import { useState } from "react";
-import { socket } from "@/lib/socket";
-import { generateKey, exportCryptoKey } from "@/lib/crypto";
-import { Button } from "@/components/ui/button";
 import { cookies } from "next/headers";
 import dotenv from "dotenv";
 dotenv.config();
 import Groupcard from "@/components/Groupcard";
+import { getCookie } from "@/lib/utils";
+
 import Inputcard from "@/components/Inputcard";
+import { session } from "@/lib/session";
 const server = process.env.NEXT_PUBLIC_SERVER_URL;
 export type Group = {
   id: string;
@@ -19,10 +18,11 @@ type AllGroupResponse = {
 };
 export default async function Dashboard() {
   const cookieStore = await cookies();
-  const session = cookieStore.get("session");
+  const token = cookieStore.get("token");
   const response = await fetch(`${server}/api/v1/room`, {
     headers: {
-      Cookie: `session=${session?.value}`,
+      "Content-Type": "application/json",
+      Authorization: `Bearer=${token?.value}`,
     },
   });
   const data: AllGroupResponse = await response.json();
@@ -46,7 +46,7 @@ export default async function Dashboard() {
         )}
       </div>
       <div className="flex justify-center">
-        <Inputcard session={session?.value} />
+        <Inputcard session={token?.value} />
       </div>
     </div>
   );

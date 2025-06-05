@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
+import { getCookie } from "@/lib/utils";
 import dotenv from "dotenv";
 dotenv.config();
 const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
@@ -43,14 +44,19 @@ export default function Chat() {
       if (!keyBufferRef.current) return;
       try {
         const key = await importSecretKey(keyBufferRef.current);
-
+        const token = getCookie("token");
+        console.log(token);
         const response = await fetch(
           `${serverUrl}/api/v1/message/group_chat?roomId=${roomId}`,
           {
-            credentials: "include",
+            headers: {
+              Authorization: `Bearer=${token}`,
+              "Content/Type": "application/json",
+            },
           }
         );
         const data = await response.json();
+        console.log(data);
         data.map(async (msg: any) => {
           const message = JSON.stringify(msg.content);
           console.log(typeof message);

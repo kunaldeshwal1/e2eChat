@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { generateKey, exportCryptoKey } from "@/lib/crypto";
 import { useRouter } from "next/navigation";
+import { getCookie } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -30,7 +31,7 @@ export default function Inputcard({ session }: Props) {
         name: roomName,
       }),
       headers: {
-        Cookie: `session=${session}`,
+        Authorization: `Bearer=${getCookie("token")}`,
         "Content-type": "application/json",
       },
     });

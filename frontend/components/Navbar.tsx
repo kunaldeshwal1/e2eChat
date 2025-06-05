@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import dotenv from "dotenv";
 import { useRouter } from "next/navigation";
+import { deleteCookie } from "@/lib/cookieFunction";
+
 dotenv.config();
 const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 export default function Navbar() {
@@ -98,6 +100,7 @@ export default function Navbar() {
                   localStorage.removeItem("currUsername");
                   localStorage.removeItem("currUserId");
                   setCurrentUserName(null);
+                  deleteCookie("token");
                   router.push("/login");
                 }}
               >

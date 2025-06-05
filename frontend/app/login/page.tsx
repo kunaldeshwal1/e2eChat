@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useUser } from "../userContext";
 import MyLottieLogin from "@/components/MyLottieLogin";
+import { setCookie } from "@/lib/cookieFunction";
 const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
 export default function Login() {
@@ -15,7 +16,7 @@ export default function Login() {
   const [errMessage, setErrMessage] = useState("");
   const { setCurrentUserName } = useUser();
   const router = useRouter();
-  const handleSubmit = async function (e: any) {
+  const handleSubmit = async function (e: React.SyntheticEvent) {
     e.preventDefault();
     const currEmail = email;
     const currPassword = password;
@@ -31,10 +32,10 @@ export default function Login() {
       },
     });
     const data = await response.json();
-    console.log("this is data", data);
     if (data) {
       localStorage.setItem("currUsername", data.name);
       localStorage.setItem("currUserId", data.id);
+      setCookie("token", data?.token);
       setCurrentUserName(data.name);
     }
     setEmail("");

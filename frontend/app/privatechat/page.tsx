@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { socket } from "../../lib/socket";
+import { cookies } from "next/headers";
+
 import {
   encryptMessage,
   decryptMessage,
@@ -11,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import dotenv from "dotenv";
+import { getCookie } from "@/lib/utils";
 dotenv.config();
 const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 interface ChatMessage {
@@ -42,15 +45,19 @@ export default function Privatechat() {
     keyBufferRef.current = keyBuffer;
     async function getMessages() {
       await new Promise((res) => setTimeout(res, 1000));
-
       if (!keyBufferRef.current) return;
+      const token = getCookie("token");
+      console.log(token);
       try {
         const key = await importSecretKey(keyBufferRef.current);
-
         const response = await fetch(
           `${serverUrl}/api/v1/message/private_chat?roomId=${roomId}`,
           {
-            credentials: "include",
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer=${token}`,
+            },
           }
         );
         const data = await response.json();

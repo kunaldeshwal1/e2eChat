@@ -79,14 +79,7 @@ router.post("/login", async (req: Request, res: Response) => {
   );
   res
     .status(200)
-
-    .cookie("session", token, {
-      httpOnly: false,
-      secure: process.env.ENVIRONMENT === "production",
-      sameSite: process.env.ENVIRONMENT === "production" ? "none" : "strict",
-      // maxAge: 60 * 60 * 1000,
-    })
-    .json({ message: "Logged in", id: user.id, name: user.name });
+    .json({ message: "Logged in", id: user.id, name: user.name, token });
 });
 //allusers
 router.get("/", auth, async (req: Request, res: Response) => {

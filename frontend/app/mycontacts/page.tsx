@@ -14,10 +14,11 @@ type AllRoomResponse = {
 };
 export default async function MyContact() {
   const cookieStore = await cookies();
-  const session = cookieStore.get("session");
+  const token = cookieStore.get("token");
   const response = await fetch(`${server}/api/v1/room/contacts`, {
     headers: {
-      Cookie: `session=${session?.value}`,
+      "Content-Type": "application/json",
+      Authorization: `Bearer=${token?.value}`,
     },
   });
   const data: AllRoomResponse = await response.json();
