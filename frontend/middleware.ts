@@ -10,6 +10,9 @@ const protectedRoutes = [
 const publicRoutes = ["/login", "/signup", "/"];
 
 export function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+  const isProtectedRoute = protectedRoutes.includes(path);
+  const isPublicRoute = publicRoutes.includes(path);
   const cookieHeader = request.headers.get("cookie") || "";
   const cookies = Object.fromEntries(
     cookieHeader
@@ -17,10 +20,11 @@ export function middleware(request: NextRequest) {
       .map((cookie) => cookie.trim().split("="))
       .map(([key, ...value]) => [key, value.join("=")])
   );
-
+  console.log("this are cookies from middleware", cookies);
+  console.log("cookies headers", cookieHeader);
   const session = cookies["session"];
 
-  if (!session) {
+  if (!session && isProtectedRoute) {
     // For example, redirect to login
     return NextResponse.redirect(new URL("/login", request.url));
   }
