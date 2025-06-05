@@ -83,6 +83,7 @@ router.post("/login", async (req: Request, res: Response) => {
       httpOnly: true, // Should be true for security
       secure: true,
       sameSite: "none",
+      domain: "e2e-chat-phi.vercel.app",
     })
     // .cookie("session", token, {
     //   httpOnly: false,
