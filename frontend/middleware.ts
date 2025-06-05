@@ -16,10 +16,11 @@ export default async function middleware(req: NextRequest) {
 
   const cookieStore = await cookies();
   const session = cookieStore.get("session");
+  console.log("This is cookieStore", cookieStore);
   console.log("this is seesion from client middleware", session);
-  if (isProtectedRoute && !session) {
-    return NextResponse.redirect(new URL("/login", req.nextUrl));
-  }
+  // if (isProtectedRoute && !session) {
+  //   return NextResponse.redirect(new URL("/login", req.nextUrl));
+  // }
 
   if (
     isPublicRoute &&
