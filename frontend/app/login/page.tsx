@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useUser } from "../userContext";
+import MyLottieLogin from "@/components/MyLottieLogin";
 const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
 export default function Login() {
@@ -43,6 +44,7 @@ export default function Login() {
   };
   return (
     <div className="flex justify-center items-center h-[80vh]">
+      {/* <MyLottieLogin /> */}
       <Card className="w-[50%] p-5">
         <CardTitle>Please Login</CardTitle>
         <form onSubmit={handleSubmit}>
