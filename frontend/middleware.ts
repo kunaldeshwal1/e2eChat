@@ -9,29 +9,49 @@ const protectedRoutes = [
 ];
 const publicRoutes = ["/login", "/signup", "/"];
 
-export default async function middleware(req: NextRequest) {
-  const path = req.nextUrl.pathname;
-  const isProtectedRoute = protectedRoutes.includes(path);
-  const isPublicRoute = publicRoutes.includes(path);
+export function middleware(request: NextRequest) {
+  const cookieHeader = request.headers.get("cookie") || "";
+  const cookies = Object.fromEntries(
+    cookieHeader
+      .split(";")
+      .map((cookie) => cookie.trim().split("="))
+      .map(([key, ...value]) => [key, value.join("=")])
+  );
 
-  const cookieStore = await cookies();
-  const session = cookieStore.get("session");
-  console.log("This is cookieStore", cookieStore);
-  console.log("this is seesion from client middleware", session);
-  // if (isProtectedRoute && !session) {
-  //   return NextResponse.redirect(new URL("/login", req.nextUrl));
-  // }
+  const session = cookies["session"];
 
-  if (
-    isPublicRoute &&
-    session &&
-    !req.nextUrl.pathname.startsWith("/dashboard")
-  ) {
-    return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+  if (!session) {
+    // For example, redirect to login
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
+  // Continue with request
   return NextResponse.next();
 }
+
+// export default async function middleware(req: NextRequest) {
+//   const path = req.nextUrl.pathname;
+//   const isProtectedRoute = protectedRoutes.includes(path);
+//   const isPublicRoute = publicRoutes.includes(path);
+
+//   const cookieStore = await cookies();
+//   const session = cookieStore.get("session");
+//   console.log("This is cookieStore", cookieStore);
+//   console.log("this is seesion from client middleware", session);
+//   // if (isProtectedRoute && !session) {
+//   //   return NextResponse.redirect(new URL("/login", req.nextUrl));
+//   // }
+
+//   if (
+//     isPublicRoute &&
+//     session &&
+//     !req.nextUrl.pathname.startsWith("/dashboard")
+//   ) {
+//     return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+//   }
+
+//   return NextResponse.next();
+// }
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
 };
