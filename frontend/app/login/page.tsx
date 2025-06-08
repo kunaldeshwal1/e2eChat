@@ -53,6 +53,7 @@ export default function Login() {
             <div>
               <Label htmlFor="name">Email</Label>
               <Input
+                id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -61,6 +62,7 @@ export default function Login() {
             <div>
               <Label htmlFor="name">Password</Label>
               <Input
+                id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
