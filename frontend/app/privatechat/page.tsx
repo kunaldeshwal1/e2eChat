@@ -1,8 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { socket } from "../../lib/socket";
-import { cookies } from "next/headers";
-
 import {
   encryptMessage,
   decryptMessage,
@@ -42,12 +40,15 @@ export default function Privatechat() {
     const roomId = localStorage.getItem("privateRoomId");
     const keyBuffer = localStorage.getItem("keyBuffer");
     const currUserId = localStorage.getItem("currUserId");
+    if (roomId && keyBuffer) {
+      socket.emit("join-room", { roomId, key: keyBuffer });
+    }
     keyBufferRef.current = keyBuffer;
     async function getMessages() {
       await new Promise((res) => setTimeout(res, 1000));
       if (!keyBufferRef.current) return;
+      console.log("running");
       const token = getCookie("token");
-      console.log(token);
       try {
         const key = await importSecretKey(keyBufferRef.current);
         const response = await fetch(
@@ -62,7 +63,6 @@ export default function Privatechat() {
         );
         const data = await response.json();
         data.map(async (msg: any) => {
-          if (shownMessageIds.current.has(msg.id)) return; // Already shown
           shownMessageIds.current.add(msg.id);
           const message = JSON.stringify(msg.content);
           const decryptedMsg = await decryptMessage(message, key);
@@ -80,10 +80,6 @@ export default function Privatechat() {
       }
     }
     getMessages();
-
-    if (roomId) {
-      socket.emit("join-room", { roomId, key: keyBuffer });
-    }
     if (!roomId || !keyBuffer) {
       router.push("/mycontacts");
       return;
@@ -94,17 +90,22 @@ export default function Privatechat() {
       .then((key) => setEncryptionKey(key))
       .catch((error) => console.error("Error importing key:", error));
 
-    const handleMessage = async (encryptedMsg: any) => {
-      const msgId = encryptedMsg.id;
+    const handleMessage = async (messageObj: any) => {
+      const msgId = messageObj.id;
+      const message = JSON.stringify(messageObj.content);
       if (shownMessageIds.current.has(msgId)) return;
       shownMessageIds.current.add(msgId);
       if (!keyBufferRef.current) return;
       try {
         const key = await importSecretKey(keyBufferRef.current);
-        const decryptedMsg = await decryptMessage(encryptedMsg, key);
+        const decryptedMsg = await decryptMessage(message, key);
         setMessages((prev) => [
           ...prev,
-          { text: decryptedMsg, type: "incoming", id: msgId },
+          {
+            text: decryptedMsg,
+            type: messageObj.senderId == currUserId ? "outgoing" : "incoming",
+            id: msgId,
+          },
         ]);
       } catch (error) {
         console.error("Decryption error:", error);
@@ -132,17 +133,18 @@ export default function Privatechat() {
     };
   }, []);
 
-  useEffect(() => {
-    const roomId = localStorage.getItem("privateRoomId");
-    if (!roomId) return;
-    localStorage.setItem("privateChatMessage", JSON.stringify(messages));
-  }, [messages]);
+  // useEffect(() => {
+  //   const roomId = localStorage.getItem("privateRoomId");
+  //   if (!roomId) return;
+  //   localStorage.setItem("privateChatMessage", JSON.stringify(messages));
+  // }, [messages]);
   const sendMessage = async () => {
     const roomId = localStorage.getItem("privateRoomId");
     const keyBuffer = localStorage.getItem("keyBuffer");
     if (!message || !encryptionKey || !roomId || !keyBuffer) return;
 
     try {
+      console.log("message sent");
       const encryptedMsg = await encryptMessage(message, encryptionKey);
       await fetch(`${serverUrl}/api/v1/message/private_chat`, {
         method: "POST",
@@ -153,16 +155,17 @@ export default function Privatechat() {
         }),
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer=${getCookie("token")}`,
         },
       });
-      socket.emit("groupMessage", {
-        roomId: roomId,
-        message: encryptedMsg,
-      });
-      setMessages((prev) => [
-        ...prev,
-        { text: message, type: "outgoing", id: tempId },
-      ]);
+      // socket.emit("groupMessage", {
+      //   roomId: roomId,
+      //   message: encryptedMsg,
+      // });
+      // setMessages((prev) => [
+      //   ...prev,
+      //   { text: message, type: "outgoing", id: tempId },
+      // ]);
       setMessage("");
     } catch (error) {
       console.error("Encryption error:", error);
@@ -213,7 +216,7 @@ export default function Privatechat() {
               const roomId = localStorage.getItem("privateRoomId");
               localStorage.removeItem("privateRoomId");
               localStorage.removeItem("keyBuffer");
-              localStorage.removeItem("privateChatMessage");
+              // localStorage.removeItem("privateChatMessage");
               socket.emit("leavePrivateChat", {
                 roomId,
               });

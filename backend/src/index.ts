@@ -26,7 +26,7 @@ app.use(
     // allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
   })
 );
-const io = new Server(httpServer, {
+export const io = new Server(httpServer, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
@@ -63,11 +63,11 @@ io.on("connection", (socket) => {
     }
   );
 
-  socket.on("groupMessage", (data: { roomId: string; message: string }) => {
-    if (data.roomId && data.message) {
-      socket.to(data.roomId).emit("groupMessage", data.message);
-    }
-  });
+  // socket.on("groupMessage", (data: { roomId: string; message: string }) => {
+  //   if (data.roomId && data.message) {
+  //     socket.to(data.roomId).emit("groupMessage", data.message);
+  //   }
+  // });
   socket.on("leaveGroupChat", ({ roomId }: { roomId: string }) => {
     socket.leave(roomId);
   });

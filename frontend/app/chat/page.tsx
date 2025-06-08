@@ -37,6 +37,9 @@ export default function Chat() {
     const currUserId = localStorage.getItem("currUserId");
     const roomId = localStorage.getItem("roomId");
     const keyBuffer = localStorage.getItem("keyBuffer");
+    if (roomId && keyBuffer) {
+      socket.emit("join-room", { roomId, key: keyBuffer });
+    }
     keyBufferRef.current = keyBuffer;
     async function getMessages() {
       await new Promise((res) => setTimeout(res, 1000));
@@ -45,13 +48,13 @@ export default function Chat() {
       try {
         const key = await importSecretKey(keyBufferRef.current);
         const token = getCookie("token");
-        console.log(token);
         const response = await fetch(
           `${serverUrl}/api/v1/message/group_chat?roomId=${roomId}`,
           {
+            method: "GET",
             headers: {
+              "Content-Type": "application/json",
               Authorization: `Bearer=${token}`,
-              "Content/Type": "application/json",
             },
           }
         );
@@ -74,10 +77,8 @@ export default function Chat() {
         console.error("some error occured", e);
       }
     }
+
     getMessages();
-    if (roomId) {
-      socket.emit("join-room", { roomId, key: keyBuffer });
-    }
     if (!roomId || !keyBuffer) {
       router.push("/");
       return;
@@ -88,14 +89,33 @@ export default function Chat() {
       .then((key) => setEncryptionKey(key))
       .catch((error) => console.error("Error importing key:", error));
 
-    const handleMessage = async (encryptedMsg: any) => {
+    // const handleMessage = async (encryptedMsg: any) => {
+    //   if (!keyBufferRef.current) return;
+    //   try {
+    //     const key = await importSecretKey(keyBufferRef.current);
+    //     const decryptedMsg = await decryptMessage(encryptedMsg, key);
+    //     setMessages((prev) => [
+    //       ...prev,
+    //       { text: decryptedMsg, type: "incoming" },
+    //     ]);
+    //   } catch (error) {
+    //     console.error("Decryption error:", error);
+    //   }
+    // };
+    const handleMessage = async (messageObj: any) => {
+      const msgId = messageObj.id;
+      const message = JSON.stringify(messageObj.content);
       if (!keyBufferRef.current) return;
       try {
         const key = await importSecretKey(keyBufferRef.current);
-        const decryptedMsg = await decryptMessage(encryptedMsg, key);
+        const decryptedMsg = await decryptMessage(message, key);
         setMessages((prev) => [
           ...prev,
-          { text: decryptedMsg, type: "incoming" },
+          {
+            text: decryptedMsg,
+            type: messageObj.senderId == currUserId ? "outgoing" : "incoming",
+            id: msgId,
+          },
         ]);
       } catch (error) {
         console.error("Decryption error:", error);
@@ -145,14 +165,15 @@ export default function Chat() {
         }),
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer=${getCookie("token")}`,
         },
       });
-      socket.emit("groupMessage", {
-        roomId: roomId,
-        message: encryptedMsg,
-      });
+      // socket.emit("groupMessage", {
+      //   roomId: roomId,
+      //   message: encryptedMsg,
+      // });
 
-      setMessages((prev) => [...prev, { text: message, type: "outgoing" }]);
+      // setMessages((prev) => [...prev, { text: message, type: "outgoing" }]);
       setMessage("");
     } catch (error) {
       console.error("Encryption error:", error);

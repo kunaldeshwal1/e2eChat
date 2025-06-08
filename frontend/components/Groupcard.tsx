@@ -43,7 +43,7 @@ export default function Groupcard({
       const exportKey = await exportCryptoKey(key);
       localStorage.setItem("roomId", id);
       localStorage.setItem("keyBuffer", exportKey);
-      socket.emit("join-room", { id, key: exportKey });
+      // socket.emit("join-room", { id, key: exportKey });
       router.push("/chat");
     } catch (error) {
       console.error("Error generating key:", error);

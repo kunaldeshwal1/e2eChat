@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { socket } from "@/lib/socket";
 import { useRouter } from "next/navigation";
-import { generateKey, exportCryptoKey } from "@/lib/crypto";
+import { getCookie } from "@/lib/utils";
 import dotenv from "dotenv";
 dotenv.config();
 const server = process.env.NEXT_PUBLIC_SERVER_URL;
@@ -22,6 +22,7 @@ type UserCardProps = {
 };
 export default function Usercard({ id, name }: UserCardProps) {
   const router = useRouter();
+  const token = getCookie("token");
   const handleClick = async function (e: React.MouseEvent<HTMLButtonElement>) {
     const currUserName = localStorage.getItem("currUsername");
     e.preventDefault();
@@ -37,6 +38,7 @@ export default function Usercard({ id, name }: UserCardProps) {
         }),
         headers: {
           "Content-type": "application/json",
+          Authorization: `Bearer=${token}`,
         },
       });
       router.push("/mycontacts");
