@@ -25,14 +25,15 @@ export default async function Users() {
   });
   const data: AllUserResponse = await response.json();
   const users: User[] = data.allUsers;
-  console.log(data);
   await new Promise((res) => setTimeout(res, 1000));
   return (
-    <div className="flex flex-col gap-1 items-center  justify-center h-[80dvh]">
+    <div className="flex gap-1 items-center justify-between ">
       {users.length ? (
-        users.map((user) => (
-          <Usercard key={user.id} id={user.id} name={user.name} />
-        ))
+        <div className="flex flex-wrap gap-2 p-2">
+          {users.map((user) => (
+            <Usercard key={user.id} id={user.id} name={user.name} />
+          ))}
+        </div>
       ) : (
         <div>No new users are here </div>
       )}

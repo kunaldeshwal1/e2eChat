@@ -31,7 +31,7 @@ export default function RootLayout({
       >
         <UserProvider>
           <Navbar />
-          {children}
+          <div className="max-w-[1200px] mx-auto">{children}</div>
         </UserProvider>
       </body>
     </html>

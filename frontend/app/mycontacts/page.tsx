@@ -24,13 +24,15 @@ export default async function MyContact() {
   const data: AllRoomResponse = await response.json();
   const rooms: Room[] = data.myRooms;
   console.log(data);
-  await new Promise((res) => setTimeout(res, 1000));
+  // await new Promise((res) => setTimeout(res, 2000));
   return (
-    <div className="flex flex-col gap-1 items-center  justify-center h-[80dvh]">
+    <div className="flex gap-1 items-center justify-center ">
       {rooms.length ? (
-        rooms.map((room, i) => (
-          <ContactCard key={i} id={room.id} name={room.name} />
-        ))
+        <div className="flex flex-wrap gap-2 p-2">
+          {rooms.map((room, i) => (
+            <ContactCard key={i} id={room.id} name={room.name} />
+          ))}
+        </div>
       ) : (
         <div>No users in contact list</div>
       )}

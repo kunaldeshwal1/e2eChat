@@ -28,7 +28,7 @@ export default function Usercard({ id, name }: UserCardProps) {
     e.preventDefault();
     if (!name) return;
     try {
-      fetch(`${server}/api/v1/room/private`, {
+      await fetch(`${server}/api/v1/room/private`, {
         method: "POST",
         credentials: "include",
         body: JSON.stringify({

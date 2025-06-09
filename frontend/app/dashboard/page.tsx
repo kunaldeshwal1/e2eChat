@@ -1,12 +1,9 @@
 import { cookies } from "next/headers";
 import dotenv from "dotenv";
-dotenv.config();
 import Groupcard from "@/components/Groupcard";
-import { getCookie } from "@/lib/utils";
-
 import Inputcard from "@/components/Inputcard";
-import { session } from "@/lib/session";
 const server = process.env.NEXT_PUBLIC_SERVER_URL;
+dotenv.config();
 export type Group = {
   id: string;
   name: string;
@@ -28,25 +25,27 @@ export default async function Dashboard() {
   const data: AllGroupResponse = await response.json();
   const groups: Group[] = data.allGroups;
   return (
-    <div>
+    <div className="flex flex-col gap-4">
+      <div className="flex justify-center">
+        <Inputcard session={token?.value} />
+      </div>
       <div className="">
-        <h1>List of available groups</h1>
+        <h1 className="flex justify-center">List of available groups</h1>
         {groups.length > 0 ? (
-          groups.map((group) => (
-            <Groupcard
-              key={group.id}
-              id={group.id}
-              name={group.name}
-              type={group.type}
-              createdById={group.createdById}
-            />
-          ))
+          <div className="flex flex-wrap gap-2 p-2">
+            {groups.map((group) => (
+              <Groupcard
+                key={group.id}
+                id={group.id}
+                name={group.name}
+                type={group.type}
+                createdById={group.createdById}
+              />
+            ))}
+          </div>
         ) : (
           <div>No groups available</div>
         )}
-      </div>
-      <div className="flex justify-center">
-        <Inputcard session={token?.value} />
       </div>
     </div>
   );

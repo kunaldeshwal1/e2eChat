@@ -63,35 +63,32 @@ export default function Navbar() {
           {currentUserName ? (
             <li className="flex gap-8 items-center">
               <Link
-                href="/chat"
-                className={`${pathname === "/chat" ? "text-gray-400" : ""}`}
-              >
-                Group Chat
-              </Link>
-              <Link
-                href="/privatechat"
-                className={`${
-                  pathname === "/privatechat" ? "text-gray-400" : ""
+                href="/dashboard"
+                className={`transition delay-150 duration-300 ease-in-out hover:scale-120 ${
+                  pathname === "/dashboard" ? "text-gray-400" : ""
                 }`}
               >
-                Private Chat
+                Groups
               </Link>
+
               <Link
                 href="/users"
-                className={`${pathname === "/users" ? "text-gray-400" : ""}`}
+                className={`transition delay-150 duration-300 ease-in-out hover:scale-120 ${
+                  pathname === "/users" ? "text-gray-400" : ""
+                }`}
               >
                 Users
               </Link>
               <Link
                 href="/mycontacts"
-                className={`${
+                className={`transition delay-150 duration-300 ease-in-out hover:scale-120 ${
                   pathname === "/mycontacts" ? "text-gray-400" : ""
                 }`}
               >
-                My contacts
+                My Contacts
               </Link>
               <Button
-                className="bg-amber-500"
+                className="bg-amber-500 hover:bg-amber-400"
                 onClick={() => {
                   fetch(`${serverUrl}/api/v1/user/logout`, {
                     method: "POST",
@@ -111,21 +108,27 @@ export default function Navbar() {
             <li className="flex gap-8 items-center">
               <Link
                 href="/"
-                className={`${pathname === "/" ? "text-gray-500" : ""}`}
+                className={`transition delay-150 duration-300 ease-in-out hover:scale-120 ${
+                  pathname === "/" ? "text-gray-500" : ""
+                }`}
               >
                 Home
               </Link>
 
               <Link
                 href="/login"
-                className={`${pathname === "/login" ? "text-gray-500" : ""}`}
+                className={`transition delay-150 duration-300 ease-in-out hover:scale-120 ${
+                  pathname === "/login" ? "text-gray-500" : ""
+                }`}
               >
                 Login
               </Link>
 
               <Link
                 href="/register"
-                className={`${pathname === "/register" ? "text-gray-500" : ""}`}
+                className={`transition delay-150 duration-300 ease-in-out hover:scale-120 ${
+                  pathname === "/register" ? "text-gray-500" : ""
+                }`}
               >
                 Sign up
               </Link>

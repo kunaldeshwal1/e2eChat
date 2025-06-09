@@ -36,7 +36,6 @@ export default function ContactCard({ id, name }: contactCardProps) {
       const exportKey = await exportCryptoKey(key);
       localStorage.setItem("privateRoomId", id);
       localStorage.setItem("keyBuffer", exportKey);
-      // socket.emit("join-room", { id, key: exportKey });
       router.push("/privatechat");
     } catch (error) {
       console.error("Error generating key:", error);
