@@ -1,8 +1,6 @@
 import { cookies } from "next/headers";
-import Usercard from "@/components/Usercard";
 import dotenv from "dotenv";
 import ContactCard from "@/components/contactcard";
-import Contactcard from "@/components/contactcard";
 dotenv.config();
 const server = process.env.NEXT_PUBLIC_SERVER_URL;
 type Room = {
@@ -23,12 +21,10 @@ export default async function MyContact() {
   });
   const data: AllRoomResponse = await response.json();
   const rooms: Room[] = data.myRooms;
-  console.log(data);
-  // await new Promise((res) => setTimeout(res, 2000));
   return (
     <div className="flex gap-1 items-center justify-center ">
       {rooms.length ? (
-        <div className="flex flex-wrap gap-2 p-2">
+        <div className="flex flex-wrap gap-2 p-2 justify-center">
           {rooms.map((room, i) => (
             <ContactCard key={i} id={room.id} name={room.name} />
           ))}

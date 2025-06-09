@@ -73,6 +73,7 @@ export default function Chat() {
             },
           ]);
         });
+        setLoading(false);
       } catch (e) {
         console.error("some error occured", e);
       }
@@ -83,25 +84,10 @@ export default function Chat() {
       router.push("/");
       return;
     }
-    setLoading(false);
 
     importSecretKey(keyBuffer)
       .then((key) => setEncryptionKey(key))
       .catch((error) => console.error("Error importing key:", error));
-
-    // const handleMessage = async (encryptedMsg: any) => {
-    //   if (!keyBufferRef.current) return;
-    //   try {
-    //     const key = await importSecretKey(keyBufferRef.current);
-    //     const decryptedMsg = await decryptMessage(encryptedMsg, key);
-    //     setMessages((prev) => [
-    //       ...prev,
-    //       { text: decryptedMsg, type: "incoming" },
-    //     ]);
-    //   } catch (error) {
-    //     console.error("Decryption error:", error);
-    //   }
-    // };
     const handleMessage = async (messageObj: any) => {
       const msgId = messageObj.id;
       const message = JSON.stringify(messageObj.content);
@@ -168,25 +154,23 @@ export default function Chat() {
           Authorization: `Bearer=${getCookie("token")}`,
         },
       });
-      // socket.emit("groupMessage", {
-      //   roomId: roomId,
-      //   message: encryptedMsg,
-      // });
-
-      // setMessages((prev) => [...prev, { text: message, type: "outgoing" }]);
       setMessage("");
     } catch (error) {
       console.error("Encryption error:", error);
     }
   };
-
-  if (loading) {
-    return null;
-  }
   return (
-    <div className="flex justify-center items-center h-[100vh]">
-      <Card className="w-[50%] p-5">
+    <div className="flex flex-col justify-center items-center gap-4">
+      <h1 className="mt-4 p-4 bg-gray-900 text-white rounded-sm">
+        Group Chat End to End Encrypted!
+      </h1>
+      <Card className="w-[50%] p-5 bg-gray-100">
         <div className="messages-container h-[400px] overflow-y-auto mb-4 p-4">
+          {loading && (
+            <div className="flex justify-center">
+              Please wait your conversation is loading...
+            </div>
+          )}
           {messages.map((msg, index) => (
             <div
               key={index}

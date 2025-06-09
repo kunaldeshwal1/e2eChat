@@ -6,7 +6,7 @@ export const RegisterSchema = z.object({
 });
 export const LoginSchema = z.object({
   email: z.string(),
-  password: z.string().min(5),
+  password: z.string().min(8),
 });
 
 export const RoomSchema = z.object({
@@ -19,7 +19,7 @@ export const PrivateRoom = z.object({
   person_two_id: z.string(),
 });
 export const MessageSchema = z.object({
-  roomId: z.string().min(3),
+  roomId: z.string(),
   encryptedContent: z.object({
     iv: z.array(z.number()),
     ciphertext: z.array(z.number()),

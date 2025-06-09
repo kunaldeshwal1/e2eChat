@@ -58,6 +58,7 @@ export default function Register() {
                 id="name"
                 type="text"
                 value={name}
+                minLength={5}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
@@ -67,6 +68,7 @@ export default function Register() {
                 id="password"
                 type="password"
                 value={password}
+                minLength={8}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>

@@ -75,6 +75,7 @@ export default function Privatechat() {
             },
           ]);
         });
+        setLoading(false);
       } catch (e) {
         console.error("some error occured", e);
       }
@@ -84,7 +85,6 @@ export default function Privatechat() {
       router.push("/mycontacts");
       return;
     }
-    setLoading(false);
 
     importSecretKey(keyBuffer)
       .then((key) => setEncryptionKey(key))
@@ -132,12 +132,6 @@ export default function Privatechat() {
       socket.off("share-key");
     };
   }, []);
-
-  // useEffect(() => {
-  //   const roomId = localStorage.getItem("privateRoomId");
-  //   if (!roomId) return;
-  //   localStorage.setItem("privateChatMessage", JSON.stringify(messages));
-  // }, [messages]);
   const sendMessage = async () => {
     const roomId = localStorage.getItem("privateRoomId");
     const keyBuffer = localStorage.getItem("keyBuffer");
@@ -158,28 +152,23 @@ export default function Privatechat() {
           Authorization: `Bearer=${getCookie("token")}`,
         },
       });
-      // socket.emit("groupMessage", {
-      //   roomId: roomId,
-      //   message: encryptedMsg,
-      // });
-      // setMessages((prev) => [
-      //   ...prev,
-      //   { text: message, type: "outgoing", id: tempId },
-      // ]);
       setMessage("");
     } catch (error) {
       console.error("Encryption error:", error);
     }
   };
-
-  if (loading) {
-    return null;
-  }
   return (
-    <div className="flex justify-center items-center h-[100vh]">
-      <h1>thisis private chat</h1>
-      <Card className="w-[50%] p-5">
+    <div className="flex flex-col justify-center items-center gap-4">
+      <h1 className="mt-4 p-4 bg-gray-900 text-white rounded-sm">
+        Private Chat End to End Encrypted!
+      </h1>
+      <Card className="w-[50%] p-5 bg-gray-100">
         <div className="messages-container h-[400px] overflow-y-auto mb-4 p-4">
+          {loading && (
+            <div className="flex justify-center">
+              Please wait your conversation is loading...
+            </div>
+          )}
           {messages.map((msg, index) => (
             <div
               key={index}

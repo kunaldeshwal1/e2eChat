@@ -40,7 +40,7 @@ export default function Login() {
     }
     setEmail("");
     setPassword("");
-    if (response.ok) router.push("/");
+    if (response.ok) router.push("/dashboard");
     else setErrMessage("No user exists with this email!");
   };
   return (
@@ -65,6 +65,7 @@ export default function Login() {
                 id="password"
                 type="password"
                 value={password}
+                minLength={8}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>

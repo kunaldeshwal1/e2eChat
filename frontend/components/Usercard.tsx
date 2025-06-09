@@ -55,10 +55,8 @@ export default function Usercard({ id, name }: UserCardProps) {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <CardTitle>
-          {name},{id}
-          <CardDescription>
-            Deploy your new project in one-click.
-          </CardDescription>
+          {name}
+          <CardDescription>Add the person to your contacts.</CardDescription>
         </CardTitle>
       </CardHeader>
       <CardFooter className="flex justify-between">

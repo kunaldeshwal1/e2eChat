@@ -52,16 +52,16 @@ export default function Inputcard({ session }: Props) {
                 id="groupname"
                 placeholder="Enter group name..."
                 value={roomName}
+                minLength={3}
+                required
                 onChange={(e) => setRoomName(e.target.value)}
               />
+              <Button onClick={createRoom}>Create</Button>
             </div>
-            <div className="flex flex-col space-y-1.5"></div>
           </div>
         </form>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button onClick={createRoom}>Create</Button>
-      </CardFooter>
+      <CardFooter className="flex justify-between"></CardFooter>
     </Card>
   );
 }

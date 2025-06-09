@@ -51,13 +51,11 @@ export default function ContactCard({ id, name }: contactCardProps) {
         </Avatar>
         <CardTitle>
           {name}
-          <CardDescription>
-            Deploy your new project in one-click.
-          </CardDescription>
+          <CardDescription>Start chat with the person.</CardDescription>
         </CardTitle>
       </CardHeader>
       <CardFooter className="flex justify-between">
-        <Button onClick={handleClick}>Start chat</Button>
+        <Button onClick={handleClick}>Start Chat</Button>
       </CardFooter>
     </Card>
   );
