@@ -44,14 +44,14 @@ export default function Login() {
     else setErrMessage("No user exists with this email!");
   };
   return (
-    <div className="flex justify-center items-center h-[80vh]">
+    <div className="flex flex-col justify-center items-center h-[80vh] md:flex-row p-12">
       <MyLottieLogin />
-      <Card className="w-[50%] p-5">
+      <Card className="w-[50%] p-5 min-w-[200px]">
         <CardTitle>Please Login</CardTitle>
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col gap-2">
-            <div>
-              <Label htmlFor="name">Email</Label>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -59,8 +59,8 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div>
-              <Label htmlFor="name">Password</Label>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"

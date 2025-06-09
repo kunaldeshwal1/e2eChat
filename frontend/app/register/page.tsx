@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
+import MyLottieLogin from "@/components/MyLottieLogin";
 const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -12,8 +13,10 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const router = useRouter();
   return (
-    <div className="flex justify-center items-center h-[80vh]">
-      <Card className="w-[50%] p-5">
+    <div className="flex flex-col justify-center items-center h-[80vh] md:flex-row p-12">
+      <MyLottieLogin />
+
+      <Card className="w-[50%] p-5 min-w-[200px]">
         <CardTitle>Please Register yourself</CardTitle>
         <form
           onSubmit={async (e) => {
@@ -40,25 +43,28 @@ export default function Register() {
           }}
         >
           <div className="flex flex-col gap-2">
-            <div>
-              <Label htmlFor="name">Email</Label>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="email">Email</Label>
               <Input
+                id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div>
+            <div className="flex flex-col gap-2">
               <Label htmlFor="name">Name</Label>
               <Input
+                id="name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
-            <div>
-              <Label htmlFor="name">Password</Label>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="password">Password</Label>
               <Input
+                id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
