@@ -44,7 +44,7 @@ export default async function Dashboard() {
             ))}
           </div>
         ) : (
-          <div>No groups available</div>
+          <div className="flex justify-center mt-2">No groups available</div>
         )}
       </div>
     </div>
