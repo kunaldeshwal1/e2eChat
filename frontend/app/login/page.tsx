@@ -57,6 +57,7 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -66,6 +67,7 @@ export default function Login() {
                 type="password"
                 value={password}
                 minLength={8}
+                required
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>

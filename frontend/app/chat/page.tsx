@@ -200,6 +200,7 @@ export default function Chat() {
             placeholder="Type your message..."
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             className="flex-1"
+            required
           />
           <Button onClick={sendMessage}>Send</Button>
           <Button

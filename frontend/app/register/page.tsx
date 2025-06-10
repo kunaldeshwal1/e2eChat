@@ -50,6 +50,7 @@ export default function Register() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -60,6 +61,7 @@ export default function Register() {
                 value={name}
                 minLength={5}
                 onChange={(e) => setName(e.target.value)}
+                required
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -70,6 +72,7 @@ export default function Register() {
                 value={password}
                 minLength={8}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
             <Button type="submit">Sign up</Button>
