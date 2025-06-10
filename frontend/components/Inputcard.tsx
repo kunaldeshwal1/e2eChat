@@ -1,67 +1,105 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { generateKey, exportCryptoKey } from "@/lib/crypto";
 import { useRouter } from "next/navigation";
 import { getCookie } from "@/lib/utils";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import dotenv from "dotenv";
 dotenv.config();
 const server = process.env.NEXT_PUBLIC_SERVER_URL;
+
 type Props = {
   session: string | undefined;
 };
+
 export default function Inputcard({ session }: Props) {
   const router = useRouter();
   const [roomName, setRoomName] = useState("");
-  const createRoom = async () => {
-    await fetch(`${server}/api/v1/room/public`, {
-      method: "POST",
-      credentials: "include",
-      body: JSON.stringify({
-        name: roomName,
-      }),
-      headers: {
-        Authorization: `Bearer=${getCookie("token")}`,
-        "Content-type": "application/json",
-      },
-    });
-    router.refresh();
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const createRoom = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!roomName.trim()) return;
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${server}/api/v1/room/public`, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({
+          name: roomName,
+        }),
+        headers: {
+          Authorization: `Bearer=${getCookie("token")}`,
+          "Content-type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        setRoomName("");
+        setOpen(false);
+        router.refresh();
+      } else {
+        console.error("Failed to create room");
+      }
+    } catch (error) {
+      console.error("Error creating room:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <Card className="w-[350px]">
-      <CardHeader>
-        <CardTitle>Create a new chat room</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form>
-          <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="groupname">Group name</Label>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="mt-4">
+          Create a New Room
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <form onSubmit={createRoom}>
+          <DialogHeader>
+            <DialogTitle>Create a New Room</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-3">
+              <Label htmlFor="name-1">Please Enter the Name</Label>
               <Input
-                id="groupname"
-                placeholder="Enter group name..."
+                id="name-1"
+                name="name"
+                placeholder="Input Here..."
                 value={roomName}
-                minLength={3}
-                required
                 onChange={(e) => setRoomName(e.target.value)}
+                required
+                disabled={isLoading}
               />
-              <Button onClick={createRoom}>Create</Button>
             </div>
           </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline" disabled={isLoading}>
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button type="submit" disabled={isLoading || !roomName.trim()}>
+              {isLoading ? "Creating..." : "Create Room"}
+            </Button>
+          </DialogFooter>
         </form>
-      </CardContent>
-      <CardFooter className="flex justify-between"></CardFooter>
-    </Card>
+      </DialogContent>
+    </Dialog>
   );
 }

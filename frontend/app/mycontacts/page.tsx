@@ -22,7 +22,8 @@ export default async function MyContact() {
   const data: AllRoomResponse = await response.json();
   const rooms: Room[] = data.myRooms;
   return (
-    <div className="flex gap-1 items-center justify-center ">
+    <div className="flex flex-col gap-2 items-center justify-center ">
+      <h1 className="mt-2">List of Your Contacts</h1>
       {rooms.length ? (
         <div className="flex flex-wrap gap-2 p-2 justify-center">
           {rooms.map((room, i) => (

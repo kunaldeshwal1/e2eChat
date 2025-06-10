@@ -30,9 +30,9 @@ export default async function Dashboard() {
         <Inputcard session={token?.value} />
       </div>
       <div className="">
-        <h1 className="flex justify-center">List of available groups</h1>
+        <h1 className="flex justify-center">List of Available Groups</h1>
         {groups.length > 0 ? (
-          <div className="flex flex-wrap gap-2 p-2">
+          <div className="flex flex-wrap justify-center gap-2 p-2">
             {groups.map((group) => (
               <Groupcard
                 key={group.id}

@@ -90,10 +90,6 @@ export default function Navbar() {
               <Button
                 className="bg-amber-500 hover:bg-amber-400"
                 onClick={() => {
-                  fetch(`${serverUrl}/api/v1/user/logout`, {
-                    method: "POST",
-                    credentials: "include",
-                  });
                   localStorage.removeItem("currUsername");
                   localStorage.removeItem("currUserId");
                   setCurrentUserName(null);

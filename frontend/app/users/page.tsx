@@ -24,7 +24,9 @@ export default async function Users() {
   const data: AllUserResponse = await response.json();
   const users: User[] = data.allUsers;
   return (
-    <div className="flex gap-1 items-center justify-between ">
+    <div className="flex flex-col gap-2 items-center justify-between ">
+      <h1 className="mt-2">List of All Users</h1>
+
       {users.length ? (
         <div className="flex flex-wrap gap-2 p-2 justify-center">
           {users.map((user) => (

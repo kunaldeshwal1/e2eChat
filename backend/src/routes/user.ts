@@ -120,12 +120,4 @@ router.get("/", auth, async (req: Request, res: Response) => {
     allUsers: availableUsers,
   });
 });
-
-//logout
-router.post("/logout", async (req: Request, res: Response) => {
-  res.clearCookie("session");
-  res.json({
-    message: "You've logged out!",
-  });
-});
 export const userRouter = router;
