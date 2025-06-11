@@ -18,6 +18,7 @@ const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 interface ChatMessage {
   text: string;
   type: "incoming" | "outgoing";
+  name: string;
 }
 
 export default function Chat() {
@@ -59,6 +60,7 @@ export default function Chat() {
           }
         );
         const data = await response.json();
+        console.log(data);
         data.map(async (msg: any) => {
           const message = JSON.stringify(msg.content);
           const decryptedMsg = await decryptMessage(message, key);
@@ -67,6 +69,7 @@ export default function Chat() {
             {
               text: decryptedMsg,
               type: msg.senderId === currUserId ? "outgoing" : "incoming",
+              name: msg.sender.name,
             },
           ]);
         });
@@ -97,6 +100,7 @@ export default function Chat() {
           {
             text: decryptedMsg,
             type: messageObj.senderId == currUserId ? "outgoing" : "incoming",
+            name: messageObj.sender.name,
             id: msgId,
           },
         ]);
@@ -177,18 +181,21 @@ export default function Chat() {
                 }`}
               >
                 <div
-                  className={`p-3 rounded-lg ${
+                  className={`flex justify-between p-3 rounded-lg ${
                     msg.type === "incoming"
                       ? "bg-gray-200 text-gray-800 rounded-tl-none"
                       : "bg-blue-500 text-white rounded-tr-none"
                   }`}
                 >
-                  {msg.text}
+                  {msg.text},
+                  <div className="text-gray-800 text-xs flex items-end">
+                    {msg.name}
+                  </div>
                 </div>
               </div>
             ))
           ) : (
-            <div>Start Your Conversation</div>
+            <div className="flex justify-center">Start Your Conversation</div>
           )}
           <div ref={messageEndRef}></div>
         </div>

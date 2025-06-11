@@ -61,6 +61,7 @@ export default function Privatechat() {
           }
         );
         const data = await response.json();
+        console.log(data);
         data.map(async (msg: any) => {
           shownMessageIds.current.add(msg.id);
           const message = JSON.stringify(msg.content);
@@ -137,7 +138,6 @@ export default function Privatechat() {
     if (!message || !encryptionKey || !roomId || !keyBuffer) return;
 
     try {
-      console.log("message sent");
       const encryptedMsg = await encryptMessage(message, encryptionKey);
       await fetch(`${serverUrl}/api/v1/message/private_chat`, {
         method: "POST",
