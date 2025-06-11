@@ -59,12 +59,9 @@ export default function Chat() {
           }
         );
         const data = await response.json();
-        console.log(data);
         data.map(async (msg: any) => {
           const message = JSON.stringify(msg.content);
-          console.log(typeof message);
           const decryptedMsg = await decryptMessage(message, key);
-          console.log(msg.senderId === currUserId);
           setMessages((prev) => [
             ...prev,
             {
@@ -171,24 +168,28 @@ export default function Chat() {
               Please wait your conversation is loading...
             </div>
           )}
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`mb-4 max-w-[70%] ${
-                msg.type === "incoming" ? "ml-0" : "ml-auto"
-              }`}
-            >
+          {messages.length ? (
+            messages.map((msg, index) => (
               <div
-                className={`p-3 rounded-lg ${
-                  msg.type === "incoming"
-                    ? "bg-gray-200 text-gray-800 rounded-tl-none"
-                    : "bg-blue-500 text-white rounded-tr-none"
+                key={index}
+                className={`mb-4 max-w-[70%] ${
+                  msg.type === "incoming" ? "ml-0" : "ml-auto"
                 }`}
               >
-                {msg.text}
+                <div
+                  className={`p-3 rounded-lg ${
+                    msg.type === "incoming"
+                      ? "bg-gray-200 text-gray-800 rounded-tl-none"
+                      : "bg-blue-500 text-white rounded-tr-none"
+                  }`}
+                >
+                  {msg.text}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div>Start Your Conversation</div>
+          )}
           <div ref={messageEndRef}></div>
         </div>
 

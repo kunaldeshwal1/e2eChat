@@ -47,7 +47,6 @@ export default function Privatechat() {
     async function getMessages() {
       await new Promise((res) => setTimeout(res, 1000));
       if (!keyBufferRef.current) return;
-      console.log("running");
       const token = getCookie("token");
       try {
         const key = await importSecretKey(keyBufferRef.current);
@@ -169,24 +168,30 @@ export default function Privatechat() {
               Please wait your conversation is loading...
             </div>
           )}
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`mb-4 max-w-[70%] ${
-                msg.type === "incoming" ? "ml-0" : "ml-auto"
-              }`}
-            >
+          {messages.length ? (
+            messages.map((msg, index) => (
               <div
-                className={`p-3 rounded-lg ${
-                  msg.type === "incoming"
-                    ? "bg-gray-200 text-gray-800 rounded-tl-none"
-                    : "bg-blue-500 text-white rounded-tr-none"
+                key={index}
+                className={`mb-4 max-w-[70%] ${
+                  msg.type === "incoming" ? "ml-0" : "ml-auto"
                 }`}
               >
-                {msg.text}
+                <div
+                  className={`p-3 rounded-lg ${
+                    msg.type === "incoming"
+                      ? "bg-gray-200 text-gray-800 rounded-tl-none"
+                      : "bg-blue-500 text-white rounded-tr-none"
+                  }`}
+                >
+                  {msg.text}
+                </div>
               </div>
+            ))
+          ) : (
+            <div className="flex justify-center font-extrabold ">
+              Start Your Conversation
             </div>
-          ))}
+          )}
           <div ref={messageEndRef}></div>
         </div>
 

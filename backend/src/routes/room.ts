@@ -5,7 +5,6 @@ import { CustomRequest } from "../authMiddleware";
 const router = express.Router();
 router.post("/public", async (req: Request, res: Response) => {
   const body = req.body;
-  console.log("this is room body", body);
   const customReq = req as CustomRequest;
 
   if (!RoomSchema.parse(body)) {
@@ -53,13 +52,11 @@ router.post("/private", async (req: Request, res: Response) => {
   }
 
   const roomId = [customReq.user.userId, body.person_two_id].sort().join("_");
-  console.log("roomid is here", roomId);
   const isRoomExists = await prismaClient.room.findUnique({
     where: {
       id: roomId,
     },
   });
-  console.log("Is room exists", isRoomExists);
   if (isRoomExists) {
     res.status(409).json({
       message: "These guys are already in each other's contact list",

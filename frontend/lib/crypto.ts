@@ -36,13 +36,6 @@ export async function encryptMessage(
     key,
     encodedMessage
   );
-
-  console.log(
-    JSON.stringify({
-      iv: Array.from(iv),
-      ciphertext: Array.from(new Uint8Array(ciphertext)),
-    })
-  );
   return JSON.stringify({
     iv: Array.from(iv),
     ciphertext: Array.from(new Uint8Array(ciphertext)),

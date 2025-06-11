@@ -24,7 +24,6 @@ router.get("/private_chat", async (req: Request, res: Response) => {
 
 router.get("/group_chat", async (req: Request, res: Response) => {
   const { roomId } = req.query;
-  console.log("Grp chat", roomId);
 
   if (!roomId || typeof roomId !== "string") {
     res.status(400).json({ error: "roomId is required" });
