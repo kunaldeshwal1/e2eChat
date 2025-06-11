@@ -132,7 +132,6 @@ router.get("/contacts", async (req: Request, res: Response) => {
 router.delete("/public/:id", async (req: Request, res: Response) => {
   const customReq = req as unknown as CustomRequest;
   const { id } = req.params;
-  console.log(id);
   const userId = customReq.user?.userId;
   const room = await prismaClient.room.findUnique({
     where: { id: id, type: "public" },
@@ -141,11 +140,11 @@ router.delete("/public/:id", async (req: Request, res: Response) => {
     res.status(404).json({ message: "Room not found" });
     return;
   }
-
-  if (room.createdById && room.createdById !== userId) {
+  if (room.createdById !== userId) {
     res
       .status(403)
       .json({ message: "You do not have permission to delete this group." });
+    return;
   }
 
   await prismaClient.room.delete({ where: { id: id } });

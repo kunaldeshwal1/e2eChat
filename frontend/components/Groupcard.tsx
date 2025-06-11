@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { socket } from "@/lib/socket";
 import { useRouter } from "next/navigation";
 import { generateKey, exportCryptoKey } from "@/lib/crypto";
-import { Group } from "@/app/dashboard/page";
+import { getCookie } from "@/lib/utils";
 import dotenv from "dotenv";
 dotenv.config();
 const server = process.env.NEXT_PUBLIC_SERVER_URL;
@@ -43,7 +43,6 @@ export default function Groupcard({
       const exportKey = await exportCryptoKey(key);
       localStorage.setItem("roomId", id);
       localStorage.setItem("keyBuffer", exportKey);
-      // socket.emit("join-room", { id, key: exportKey });
       router.push("/chat");
     } catch (error) {
       console.error("Error generating key:", error);
@@ -53,6 +52,10 @@ export default function Groupcard({
     await fetch(`${server}/api/v1/room/public/${id}`, {
       method: "DELETE",
       credentials: "include",
+      headers: {
+        Authorization: `Bearer=${getCookie("token")}`,
+        "Content-Type": "application/json",
+      },
     });
     router.refresh();
   };
