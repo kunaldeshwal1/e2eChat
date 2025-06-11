@@ -100,7 +100,7 @@ export default function Chat() {
           {
             text: decryptedMsg,
             type: messageObj.senderId == currUserId ? "outgoing" : "incoming",
-            name: messageObj.sender.name,
+            name: messageObj.senderId.name,
             id: msgId,
           },
         ]);
