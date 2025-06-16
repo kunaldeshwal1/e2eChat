@@ -12,7 +12,7 @@ dotenv.config();
 const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 export default function Navbar() {
   const { currentUserName, setCurrentUserName } = useUser();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -27,7 +27,7 @@ export default function Navbar() {
   }, []);
   if (currentUserName === undefined) return null;
   return (
-    <div className="flex justify-between h-24 bg-gray-900 text-[#fff]">
+    <div className="relative flex justify-between h-24 bg-gray-900 text-[#fff]">
       <div className="flex items-center pl-2">
         <img src="/favicon.png" className="h-10" alt="" />
       </div>
@@ -55,7 +55,7 @@ export default function Navbar() {
         <ul
           className={`md:static md:flex md:gap-12 ${
             open
-              ? "flex flex-col absolute rounded-b-sm left-0 bg-gray-500"
+              ? "flex flex-col absolute right-0 top-24 rounded-b-sm  bg-blue-900"
               : "hidden"
           } transition-all`}
           onClick={() => setOpen(false)}
@@ -101,7 +101,7 @@ export default function Navbar() {
               </Button>
             </li>
           ) : (
-            <li className="flex gap-8 items-center">
+            <li className="flex flex-col p-4 md:static md:flex-row gap-8">
               <Link
                 href="/"
                 className={`transition delay-150 duration-300 ease-in-out hover:scale-120 ${
