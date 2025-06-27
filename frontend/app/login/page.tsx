@@ -33,9 +33,9 @@ export default function Login() {
     });
     const data = await response.json();
     if (data) {
-      localStorage.setItem("currUsername", data.name);
-      localStorage.setItem("currUserId", data.id);
-      setCookie("token", data?.token);
+      if (data.name) localStorage.setItem("currUsername", data.name);
+      if (data.id) localStorage.setItem("currUserId", data.id);
+      if (data.token) setCookie("token", data?.token);
       setCurrentUserName(data.name);
     }
     setEmail("");

@@ -25,7 +25,14 @@ export default function Navbar() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  if (currentUserName === undefined) return null;
+
+  useEffect(() => {
+    if (currentUserName === undefined) {
+      alert("Please register first no user found");
+      router.push("/register");
+    }
+  }, [currentUserName, router]);
+
   return (
     <div className="relative flex justify-between h-24 bg-gray-900 text-[#fff]">
       <div className="flex items-center pl-2">
