@@ -60,7 +60,6 @@ export default function Chat() {
           }
         );
         const data = await response.json();
-        console.log(data);
         data.map(async (msg: any) => {
           const message = JSON.stringify(msg.content);
           const decryptedMsg = await decryptMessage(message, key);
@@ -111,9 +110,7 @@ export default function Chat() {
 
     socket.on("groupMessage", handleMessage);
 
-    socket.on("user joined", (text: string) => {
-      console.log(text);
-    });
+    socket.on("user joined", (text: string) => {});
 
     socket.on("share-key", (sharedKeyBuffer: string) => {
       localStorage.setItem("keyBuffer", sharedKeyBuffer);
