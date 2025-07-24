@@ -61,7 +61,7 @@ export default function Privatechat() {
           }
         );
         const data = await response.json();
-        console.log(data);
+
         data.map(async (msg: any) => {
           shownMessageIds.current.add(msg.id);
           const message = JSON.stringify(msg.content);
@@ -114,9 +114,7 @@ export default function Privatechat() {
 
     socket.on("groupMessage", handleMessage);
 
-    socket.on("user joined", (text: string) => {
-      console.log(text);
-    });
+    socket.on("user joined", (text: string) => {});
 
     socket.on("share-key", (sharedKeyBuffer: string) => {
       localStorage.setItem("keyBuffer", sharedKeyBuffer);
