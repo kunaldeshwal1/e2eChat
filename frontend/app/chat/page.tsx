@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { socket } from "../../lib/socket";
 import {
   encryptMessage,
@@ -11,14 +11,15 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { getCookie } from "@/lib/utils";
-import dotenv from "dotenv";
-dotenv.config();
+
+// Remove dotenv from frontend! Use Next.js env variable directly.
 const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
 interface ChatMessage {
   text: string;
   type: "incoming" | "outgoing";
   name: string;
+  id?: string;
 }
 
 export default function Chat() {
@@ -28,29 +29,26 @@ export default function Chat() {
   const [encryptionKey, setEncryptionKey] = useState<CryptoKey | null>(null);
   const [loading, setLoading] = useState(true);
   const messageEndRef = useRef<HTMLDivElement | null>(null);
-  const keyBufferRef = useRef<string | null>(null);
+
+  const currUserId = useRef<string | null>(null);
+  const roomId = useRef<string | null>(null);
+
+  // Scroll to the latest message
   useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
-  useEffect(() => {
-    const currUserId = localStorage.getItem("currUserId");
-    const roomId = localStorage.getItem("roomId");
-    const keyBuffer = localStorage.getItem("keyBuffer");
-    if (roomId && keyBuffer) {
-      socket.emit("join-room", { roomId, key: keyBuffer });
-    }
-    keyBufferRef.current = keyBuffer;
-    async function getMessages() {
-      await new Promise((res) => setTimeout(res, 1000));
 
-      if (!keyBufferRef.current) return;
+  // Fetch and decrypt all messages, only after we have the key
+  const fetchAndDecryptMessages = useCallback(
+    async (keyBuffer: string, importedKey: CryptoKey) => {
+      setLoading(true);
       try {
-        const key = await importSecretKey(keyBufferRef.current);
+        const room = roomId.current;
         const token = getCookie("token");
         const response = await fetch(
-          `${serverUrl}/api/v1/message/group_chat?roomId=${roomId}`,
+          `${serverUrl}/api/v1/message/group_chat?roomId=${room}`,
           {
             method: "GET",
             headers: {
@@ -60,82 +58,126 @@ export default function Chat() {
           }
         );
         const data = await response.json();
-        data.map(async (msg: any) => {
-          const message = JSON.stringify(msg.content);
-          const decryptedMsg = await decryptMessage(message, key);
-          setMessages((prev) => [
-            ...prev,
-            {
-              text: decryptedMsg,
-              type: msg.senderId === currUserId ? "outgoing" : "incoming",
-              name: msg.sender.name,
-            },
-          ]);
-        });
-        setLoading(false);
+        // Clear old messages before re-populating
+        setMessages([]);
+        // Decrypt each message and append
+        for (let msg of data) {
+          const messageStr = JSON.stringify(msg.content);
+          try {
+            const decryptedMsg = await decryptMessage(messageStr, importedKey);
+            setMessages((prev) => [
+              ...prev,
+              {
+                text: decryptedMsg,
+                type:
+                  msg.senderId === currUserId.current ? "outgoing" : "incoming",
+                name: msg.sender.name,
+                id: msg._id || undefined,
+              },
+            ]);
+          } catch (decryptErr) {
+            console.error("Error decrypting a message:", decryptErr);
+          }
+        }
       } catch (e) {
-        console.error("some error occured", e);
+        console.error("Fetch/decrypt error:", e);
       }
-    }
+      setLoading(false);
+    },
+    []
+  );
 
-    getMessages();
-    if (!roomId || !keyBuffer) {
+  // Main effect: Set up room, key, socket listeners, initial fetch
+  useEffect(() => {
+    currUserId.current = localStorage.getItem("currUserId");
+    roomId.current = localStorage.getItem("roomId");
+    const keyBuffer = localStorage.getItem("keyBuffer");
+
+    // Sanity: if roomId or keyBuffer is missing, redirect
+    if (!roomId.current || !keyBuffer) {
       router.push("/");
       return;
     }
 
+    // Set up, import the key, THEN fetch and decrypt messages
     importSecretKey(keyBuffer)
-      .then((key) => setEncryptionKey(key))
-      .catch((error) => console.error("Error importing key:", error));
+      .then((importedKey) => {
+        setEncryptionKey(importedKey);
+        fetchAndDecryptMessages(keyBuffer, importedKey);
+      })
+      .catch((error) => {
+        console.error("Failed to import key:", error);
+        // If we can't get the key, redirect to home
+        router.push("/");
+      });
+
+    // Always join the socket room
+    socket.emit("join-room", { roomId: roomId.current, key: keyBuffer });
+
+    // Handler for receiving new group messages via socket
     const handleMessage = async (messageObj: any) => {
-      const msgId = messageObj.id;
-      const message = JSON.stringify(messageObj.content);
-      if (!keyBufferRef.current) return;
+      if (!encryptionKey) {
+        // Race condition: key missing
+        console.warn(
+          "Encryption key is not ready yet, can't decrypt incoming message"
+        );
+        return;
+      }
       try {
-        const key = await importSecretKey(keyBufferRef.current);
-        const decryptedMsg = await decryptMessage(message, key);
+        const messageStr = JSON.stringify(messageObj.content);
+        const decryptedMsg = await decryptMessage(messageStr, encryptionKey);
+
         setMessages((prev) => [
           ...prev,
           {
             text: decryptedMsg,
-            type: messageObj.senderId == currUserId ? "outgoing" : "incoming",
-            name: messageObj.senderId.name,
-            id: msgId,
+            type:
+              messageObj.senderId === currUserId.current
+                ? "outgoing"
+                : "incoming",
+            name: messageObj.sender?.name || "",
+            id: messageObj.id,
           },
         ]);
       } catch (error) {
-        console.error("Decryption error:", error);
+        console.error("Decryption error (socket message):", error);
       }
     };
 
     socket.on("groupMessage", handleMessage);
 
-    socket.on("user joined", (text: string) => {});
-
     socket.on("share-key", (sharedKeyBuffer: string) => {
+      // New group key received (when a new member joins, or key rotates)
       localStorage.setItem("keyBuffer", sharedKeyBuffer);
-      keyBufferRef.current = sharedKeyBuffer;
       importSecretKey(sharedKeyBuffer)
-        .then((key) => setEncryptionKey(key))
-        .catch((error) => console.error("Error importing shared key:", error));
+        .then((newKey) => {
+          setEncryptionKey(newKey);
+          // Re-fetch and re-decrypt all messages with new key!
+          fetchAndDecryptMessages(sharedKeyBuffer, newKey);
+        })
+        .catch((err) => {
+          console.error("Failed to import shared key:", err);
+        });
     });
 
+    // Clean up listeners
     return () => {
       socket.off("groupMessage", handleMessage);
-      socket.off("user joined");
       socket.off("share-key");
     };
-  }, []);
+  }, [fetchAndDecryptMessages, encryptionKey, router]);
 
+  // Persist messages to localStorage for session caching (optional)
   useEffect(() => {
-    const roomId = localStorage.getItem("roomId");
-    if (!roomId) return;
-    localStorage.setItem("chatMessage", JSON.stringify(messages));
+    if (roomId.current && messages.length > 0) {
+      localStorage.setItem("chatMessage", JSON.stringify(messages));
+    }
   }, [messages]);
+
+  // --- Sending a message ---
   const sendMessage = async () => {
-    const roomId = localStorage.getItem("roomId");
     const keyBuffer = localStorage.getItem("keyBuffer");
-    if (!message || !encryptionKey || !roomId || !keyBuffer) return;
+    if (!message || !encryptionKey || !roomId.current || !keyBuffer) return;
 
     try {
       const encryptedMsg = await encryptMessage(message, encryptionKey);
@@ -144,7 +186,7 @@ export default function Chat() {
         method: "POST",
         credentials: "include",
         body: JSON.stringify({
-          roomId: roomId,
+          roomId: roomId.current,
           encryptedContent: encryptedMsg,
         }),
         headers: {
@@ -154,9 +196,21 @@ export default function Chat() {
       });
       setMessage("");
     } catch (error) {
-      console.error("Encryption error:", error);
+      console.error("Encryption/send error:", error);
     }
   };
+
+  // --- Exiting the room ---
+  const exitRoom = () => {
+    const room = localStorage.getItem("roomId");
+    localStorage.removeItem("roomId");
+    localStorage.removeItem("keyBuffer");
+    localStorage.removeItem("chatMessage");
+    socket.emit("leaveGroupChat", { roomId: room });
+    router.push("/dashboard");
+  };
+
+  // --- Render ---
   return (
     <div className="flex flex-col justify-center items-center gap-4">
       <h1 className="mt-4 p-4 bg-gray-900 text-white rounded-sm">
@@ -169,10 +223,10 @@ export default function Chat() {
               Please wait your conversation is loading...
             </div>
           )}
-          {messages.length ? (
+          {!loading && messages.length ? (
             messages.map((msg, index) => (
               <div
-                key={index}
+                key={msg.id || index}
                 className={`mb-4 max-w-[70%] ${
                   msg.type === "incoming" ? "ml-0" : "ml-auto"
                 }`}
@@ -191,9 +245,9 @@ export default function Chat() {
                 </div>
               </div>
             ))
-          ) : (
+          ) : !loading ? (
             <div className="flex justify-center">Start Your Conversation</div>
-          )}
+          ) : null}
           <div ref={messageEndRef}></div>
         </div>
 
@@ -208,20 +262,7 @@ export default function Chat() {
             required
           />
           <Button onClick={sendMessage}>Send</Button>
-          <Button
-            onClick={() => {
-              const roomId = localStorage.getItem("roomId");
-              localStorage.removeItem("roomId");
-              localStorage.removeItem("keyBuffer");
-              localStorage.removeItem("chatMessage");
-              socket.emit("leaveGroupChat", {
-                roomId,
-              });
-              router.push("/dashboard");
-            }}
-          >
-            Exit Room
-          </Button>
+          <Button onClick={exitRoom}>Exit Room</Button>
         </div>
       </Card>
     </div>
