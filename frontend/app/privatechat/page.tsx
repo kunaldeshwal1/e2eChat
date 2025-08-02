@@ -21,6 +21,7 @@ interface ChatMessage {
 }
 
 export default function Privatechat() {
+  const tempId = Date.now();
   const router = useRouter();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
