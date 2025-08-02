@@ -184,7 +184,7 @@ export default function Chat() {
                       : "bg-blue-500 text-white rounded-tr-none"
                   }`}
                 >
-                  {msg.text}
+                  {msg.text},
                   <div className="text-gray-800 text-xs flex items-end">
                     {msg.name}
                   </div>
