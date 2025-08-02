@@ -61,8 +61,6 @@ router.post("/private_chat", async (req: Request, res: Response) => {
       roomId: parsedRoomId,
     },
   });
-  console.log("this is saved msg", savedMessage);
-
   io.to(parsedRoomId).emit("groupMessage", savedMessage);
 
   res.json({ message: "sent successfully" });

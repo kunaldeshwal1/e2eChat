@@ -41,16 +41,7 @@ export default function Chat() {
     if (roomId && keyBuffer) {
       socket.emit("join-room", { roomId, key: keyBuffer });
     }
-    socket.on("share-key", (sharedKeyBuffer: string) => {
-      keyBufferRef.current = sharedKeyBuffer;
-      importSecretKey(sharedKeyBuffer)
-        .then((key) => setEncryptionKey(key))
-        .catch((error) => console.error("Error importing shared key:", error));
-      if (!sessionStorage.getItem("reloadedAfterShareKey")) {
-        sessionStorage.setItem("reloadedAfterShareKey", "true");
-        window.location.reload();
-      }
-    });
+    keyBufferRef.current = keyBuffer;
     async function getMessages() {
       await new Promise((res) => setTimeout(res, 1000));
 
@@ -120,6 +111,18 @@ export default function Chat() {
     socket.on("groupMessage", handleMessage);
 
     socket.on("user joined", (text: string) => {});
+
+    socket.on("share-key", (sharedKeyBuffer: string) => {
+      localStorage.setItem("keyBuffer", sharedKeyBuffer);
+      keyBufferRef.current = sharedKeyBuffer;
+      importSecretKey(sharedKeyBuffer)
+        .then((key) => setEncryptionKey(key))
+        .catch((error) => console.error("Error importing shared key:", error));
+      if (!sessionStorage.getItem("reloadedAfterShareKey")) {
+        sessionStorage.setItem("reloadedAfterShareKey", "true");
+        window.location.reload();
+      }
+    });
 
     router.refresh();
     return () => {
