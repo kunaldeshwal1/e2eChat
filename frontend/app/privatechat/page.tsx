@@ -122,6 +122,10 @@ export default function Privatechat() {
       importSecretKey(sharedKeyBuffer)
         .then((key) => setEncryptionKey(key))
         .catch((error) => console.error("Error importing shared key:", error));
+      if (!sessionStorage.getItem("reloadedAfterShareKey")) {
+        sessionStorage.setItem("reloadedAfterShareKey", "true");
+        window.location.reload();
+      }
     });
 
     return () => {

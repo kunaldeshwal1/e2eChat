@@ -118,7 +118,10 @@ export default function Chat() {
       importSecretKey(sharedKeyBuffer)
         .then((key) => setEncryptionKey(key))
         .catch((error) => console.error("Error importing shared key:", error));
-      window.location.reload();
+      if (!sessionStorage.getItem("reloadedAfterShareKey")) {
+        sessionStorage.setItem("reloadedAfterShareKey", "true");
+        window.location.reload();
+      }
     });
 
     router.refresh();
