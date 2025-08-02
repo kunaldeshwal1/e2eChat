@@ -118,8 +118,10 @@ export default function Chat() {
       importSecretKey(sharedKeyBuffer)
         .then((key) => setEncryptionKey(key))
         .catch((error) => console.error("Error importing shared key:", error));
+      window.location.reload();
     });
 
+    router.refresh();
     return () => {
       socket.off("groupMessage", handleMessage);
       socket.off("user joined");
